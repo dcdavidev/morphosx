@@ -34,10 +34,10 @@ class Settings(BaseSettings):
     def cache_dir(self) -> str:
         return str(Path(self.storage_root) / "cache")
     
-    # --- IMAGE ENGINE DEFAULTS ---
+    # --- IMAGE & VIDEO ENGINE DEFAULTS ---
     default_quality: int = 80
     max_image_dimension: int = 4096
-    allowed_formats: List[str] = ["jpeg", "png", "webp"]
+    allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov"]
     
     # --- ENVIRONMENT CONFIG ---
     model_config = SettingsConfigDict(
