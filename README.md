@@ -6,7 +6,7 @@
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
 
-`morphosx` is a high-speed, minimal cloud storage and image manipulation server. Designed as a lightweight alternative to Cloudinary, it focuses on extreme efficiency, asynchronous processing, and secure distribution.
+`morphosx` is a high-speed, minimal cloud storage and image manipulation server. It focuses on extreme efficiency, asynchronous processing, and secure distribution.
 
 ---
 
