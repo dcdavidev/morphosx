@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     engine_type: str = "pillow"
     default_quality: int = 80
     max_image_dimension: int = 4096
-    allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw", "json", "xml", "md", "heic", "heif", "avif", "docx", "pptx", "xlsx"]
+    allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw", "json", "xml", "md", "heic", "heif", "avif", "docx", "pptx", "xlsx", "ttf", "otf"]
     
     # --- ENVIRONMENT CONFIG ---
     model_config = SettingsConfigDict(
