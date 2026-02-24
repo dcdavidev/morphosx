@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # --- IMAGE & MEDIA ENGINE DEFAULTS ---
     default_quality: int = 80
     max_image_dimension: int = 4096
-    allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf"]
+    allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw"]
     
     # --- ENVIRONMENT CONFIG ---
     model_config = SettingsConfigDict(

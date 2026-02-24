@@ -9,6 +9,7 @@ from morphosx.app.engine.processor import ImageProcessor, ProcessingOptions, Ima
 from morphosx.app.engine.video import VideoProcessor
 from morphosx.app.engine.audio import AudioProcessor
 from morphosx.app.engine.document import DocumentProcessor
+from morphosx.app.engine.raw import RawProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.settings import settings
 
@@ -20,11 +21,13 @@ processor = ImageProcessor()
 video_processor = VideoProcessor()
 audio_processor = AudioProcessor()
 document_processor = DocumentProcessor()
+raw_processor = RawProcessor()
 storage = LocalStorage(base_directory=settings.storage_root)
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
 DOCUMENT_EXTENSIONS = {".pdf"}
+RAW_EXTENSIONS = {".cr2", ".nef", ".dng", ".arw"}
 
 
 
@@ -140,6 +143,7 @@ async def get_processed_asset(
         
         # 6. Transform Pipeline
         is_audio = Path(asset_id).suffix.lower() in AUDIO_EXTENSIONS
+        is_raw = Path(asset_id).suffix.lower() in RAW_EXTENSIONS
 
         if is_video:
             # Video: Extract Frame -> Process as Image
@@ -154,6 +158,10 @@ async def get_processed_asset(
             # We extract at 150 DPI to ensure crisp text before potential downscaling
             page_bytes = document_processor.extract_page_as_image(source_bytes, p, dpi=150)
             processed_data, mime_type = processor.process(page_bytes, options)
+        elif is_raw:
+            # RAW: Extract Preview -> Process as Image
+            preview_bytes = raw_processor.extract_preview(source_bytes)
+            processed_data, mime_type = processor.process(preview_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
