@@ -25,8 +25,8 @@ WORKDIR /app
 # Copy dependency files
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies (without dev group)
-RUN poetry install --no-root --without dev
+# Install dependencies (only project dependencies)
+RUN poetry install --no-root --sync
 
 
 # --- STAGE 2: Runtime ---
