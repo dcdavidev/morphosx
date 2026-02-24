@@ -1,8 +1,5 @@
 import io
 from typing import Tuple
-from docx import Document
-from pptx import Presentation
-from openpyxl import load_workbook
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -18,6 +15,13 @@ class OfficeProcessor:
         """
         Generate a summary image for a DOCX, PPTX or XLSX file.
         """
+        try:
+            from docx import Document
+            from pptx import Presentation
+            from openpyxl import load_workbook
+        except ImportError:
+            raise RuntimeError("python-docx, python-pptx, or openpyxl are not installed. Run 'pip install morphosx[office]' to enable this feature.")
+
         ext = filename.split(".")[-1].lower()
         title = "Office Document"
         summary = ""

@@ -1,4 +1,3 @@
-import fitz  # PyMuPDF
 import io
 
 
@@ -16,6 +15,11 @@ class DocumentProcessor:
         :param dpi: Resolution for rendering the page to image.
         :return: PNG image bytes.
         """
+        try:
+            import fitz  # PyMuPDF
+        except ImportError:
+            raise RuntimeError("pymupdf is not installed. Run 'pip install morphosx[pdf]' to enable this feature.")
+
         try:
             # Open PDF from memory stream
             doc = fitz.open(stream=document_data, filetype="pdf")

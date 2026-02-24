@@ -1,6 +1,4 @@
 import io
-import ifcopenshell
-import ifcopenshell.util.element
 from PIL import Image, ImageDraw
 
 
@@ -13,6 +11,12 @@ class BIMProcessor:
         """
         Create a technical data card for an IFC file.
         """
+        try:
+            import ifcopenshell
+            import ifcopenshell.util.element
+        except ImportError:
+            raise RuntimeError("ifcopenshell is not installed. Run 'pip install morphosx[bim]' to enable this feature.")
+
         try:
             # Load IFC from memory
             # IfcOpenShell usually expects a file path, but we can use a temp file 

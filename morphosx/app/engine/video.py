@@ -1,4 +1,3 @@
-import ffmpeg
 import io
 import os
 import tempfile
@@ -20,6 +19,11 @@ class VideoProcessor:
         :param timestamp: Time in seconds to extract the frame from.
         :return: JPEG bytes of the extracted frame.
         """
+        try:
+            import ffmpeg
+        except ImportError:
+            raise RuntimeError("ffmpeg-python is not installed. Run 'pip install morphosx[video]' to enable this feature.")
+
         # FFmpeg works with file paths, so we need a temporary file
         # unless we pipe, but piping video bytes can be complex.
         # For simplicity and performance, we use a temporary file in /tmp (RAM-backed in many Linux distros)
@@ -47,6 +51,11 @@ class VideoProcessor:
         """
         Probe video for metadata (resolution, duration, etc).
         """
+        try:
+            import ffmpeg
+        except ImportError:
+            raise RuntimeError("ffmpeg-python is not installed. Run 'pip install morphosx[video]' to enable this feature.")
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=".video") as tmp:
             tmp.write(video_data)
             tmp_path = tmp.name

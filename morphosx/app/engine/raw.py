@@ -1,6 +1,4 @@
 import io
-import rawpy
-import imageio.v3 as iio
 from PIL import Image
 
 
@@ -16,6 +14,12 @@ class RawProcessor:
         :param raw_data: Raw bytes of the image file.
         :return: Standard image bytes (e.g., JPEG or PNG) ready for ImageProcessor.
         """
+        try:
+            import rawpy
+            import imageio.v3 as iio
+        except ImportError:
+            raise RuntimeError("rawpy or imageio is not installed. Run 'pip install morphosx[raw]' to enable this feature.")
+
         try:
             # Load raw data from memory buffer
             with rawpy.imread(io.BytesIO(raw_data)) as raw:

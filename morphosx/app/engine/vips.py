@@ -1,4 +1,3 @@
-import pyvips
 import io
 from typing import Optional, Tuple
 from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
@@ -20,6 +19,11 @@ class VipsProcessor:
         :param options: Transformation parameters.
         :return: A tuple of (processed bytes, mime type).
         """
+        try:
+            import pyvips
+        except ImportError:
+            raise RuntimeError("pyvips is not installed. Run 'pip install morphosx[vips]' to enable this feature.")
+
         try:
             # Load image from memory buffer
             img = pyvips.Image.new_from_buffer(source_data, "")
@@ -48,15 +52,15 @@ class VipsProcessor:
         except Exception as e:
             raise RuntimeError(f"Vips processing failed: {str(e)}")
 
-    def _resize(self, img: pyvips.Image, width: Optional[int], height: Optional[int]) -> pyvips.Image:
+    def _resize(self, img, width: Optional[int], height: Optional[int]):
         """
         Resize image while maintaining aspect ratio using libvips' thumbnail-style scaling.
-        
-        :param img: pyvips Image object.
-        :param width: Target width.
-        :param height: Target height.
-        :return: Resized pyvips Image object.
         """
+        try:
+            import pyvips
+        except ImportError:
+            raise RuntimeError("pyvips is not installed.")
+            
         original_width = img.width
         original_height = img.height
 
