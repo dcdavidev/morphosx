@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFi
 from morphosx.app.core.security import verify_signature, generate_signature
 from morphosx.app.engine.processor import ImageProcessor, ProcessingOptions, ImageFormat
 from morphosx.app.engine.video import VideoProcessor
+from morphosx.app.engine.audio import AudioProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.settings import settings
 
@@ -16,9 +17,11 @@ router = APIRouter(prefix="/assets", tags=["Assets"])
 # Singleton instances
 processor = ImageProcessor()
 video_processor = VideoProcessor()
+audio_processor = AudioProcessor()
 storage = LocalStorage(base_directory=settings.storage_root)
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
+AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
 
 
 @router.post("/upload")
@@ -127,10 +130,16 @@ async def get_processed_asset(
         source_bytes = await storage.get_asset(original_id)
         
         # 6. Transform Pipeline
+        is_audio = Path(asset_id).suffix.lower() in AUDIO_EXTENSIONS
+
         if is_video:
             # Video: Extract Frame -> Process as Image
             frame_bytes = video_processor.extract_thumbnail(source_bytes, t)
             processed_data, mime_type = processor.process(frame_bytes, options)
+        elif is_audio:
+            # Audio: Generate Waveform -> Process as Image
+            waveform_bytes = audio_processor.generate_waveform(source_bytes, w or 800, h or 200)
+            processed_data, mime_type = processor.process(waveform_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
