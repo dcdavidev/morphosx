@@ -584,7 +584,7 @@ files = [
     {file = "cffi-2.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:b882b3df248017dba09d6b16defe9b5c407fe32fc7c65a9c69798e6175601be9"},
     {file = "cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"},
 ]
-markers = {dev = "platform_python_implementation != \"PyPy\""}
+markers = {main = "platform_python_implementation != \"PyPy\" or extra == \"vips\" or extra == \"full\"", dev = "platform_python_implementation != \"PyPy\""}
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
@@ -842,9 +842,10 @@ test-randomorder = ["pytest-randomly"]
 name = "dataclasses-json"
 version = "0.6.7"
 description = "Easily serialize dataclasses to and from JSON."
-optional = false
+optional = true
 python-versions = "<4.0,>=3.7"
 groups = ["main"]
+markers = "extra == \"3d\" or extra == \"full\""
 files = [
     {file = "dataclasses_json-0.6.7-py3-none-any.whl", hash = "sha256:0dbf33f26c8d5305befd61b39d2b3414e8a407bedc2834dea9b8d642666fb40a"},
     {file = "dataclasses_json-0.6.7.tar.gz", hash = "sha256:b6b3e528266ea45b9535223bc53ca645f5208833c29229e847b3f26a1cc55fc0"},
@@ -877,6 +878,7 @@ files = [
     {file = "deprecated-1.3.1-py2.py3-none-any.whl", hash = "sha256:597bfef186b6f60181535a29fbe44865ce137a5079f295b479886c82729d5f3f"},
     {file = "deprecated-1.3.1.tar.gz", hash = "sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223"},
 ]
+markers = {main = "extra == \"3d\" or extra == \"full\""}
 
 [package.dependencies]
 wrapt = ">=1.10,<3"
@@ -907,9 +909,10 @@ gmpy2 = ["gmpy2"]
 name = "et-xmlfile"
 version = "2.0.0"
 description = "An implementation of lxml.xmlfile for the standard library"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "et_xmlfile-2.0.0-py3-none-any.whl", hash = "sha256:7a91720bc756843502c3b7504c77b8fe44217c85c537d85037f0f536151b2caa"},
     {file = "et_xmlfile-2.0.0.tar.gz", hash = "sha256:dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54"},
@@ -943,9 +946,10 @@ standard-no-fastapi-cloud-cli = ["email-validator (>=2.0.0)", "fastapi-cli[stand
 name = "ffmpeg-python"
 version = "0.2.0"
 description = "Python bindings for FFmpeg - with complex filtering support"
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"video\" or extra == \"full\""
 files = [
     {file = "ffmpeg-python-0.2.0.tar.gz", hash = "sha256:65225db34627c578ef0e11c8b1eb528bb35e024752f6f10b78c011f6f64c4127"},
     {file = "ffmpeg_python-0.2.0-py3-none-any.whl", hash = "sha256:ac441a0404e053f8b6a1113a77c0f452f1cfc62f6344a769475ffdc0f56c23c5"},
@@ -1101,9 +1105,10 @@ files = [
 name = "future"
 version = "1.0.0"
 description = "Clean single-source support for Python 3 and 2"
-optional = false
+optional = true
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 groups = ["main"]
+markers = "extra == \"video\" or extra == \"full\""
 files = [
     {file = "future-1.0.0-py3-none-any.whl", hash = "sha256:929292d34f5872e70396626ef385ec22355a1fae8ad29e1a734c3e43f9fbc216"},
     {file = "future-1.0.0.tar.gz", hash = "sha256:bd2968309307861edae1458a4f8a4f3598c03be43b97521076aebf5d94c07b05"},
@@ -1140,9 +1145,10 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 name = "ifcopenshell"
 version = "0.8.4.post1"
 description = "Python bindings, utility functions, and high-level API for IfcOpenShell"
-optional = false
+optional = true
 python-versions = "<3.15,>=3.9"
 groups = ["main"]
+markers = "extra == \"bim\" or extra == \"full\""
 files = [
     {file = "ifcopenshell-0.8.4.post1-py310-none-macosx_10_15_x86_64.whl", hash = "sha256:0d8749bc9741e06280b84a05bb23e3c6b84b60bf8268e9ad022895097a36b6ce"},
     {file = "ifcopenshell-0.8.4.post1-py310-none-macosx_11_0_arm64.whl", hash = "sha256:c404474f421d64746563a4a8607b116cb31d0edef058a7e51c6383e221654486"},
@@ -1192,9 +1198,10 @@ dev = ["pytest", "tabulate"]
 name = "imageio"
 version = "2.37.2"
 description = "Read and write images and video across all major formats. Supports scientific and volumetric data."
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "extra == \"raw\" or extra == \"full\""
 files = [
     {file = "imageio-2.37.2-py3-none-any.whl", hash = "sha256:ad9adfb20335d718c03de457358ed69f141021a333c40a53e57273d8a5bd0b9b"},
     {file = "imageio-2.37.2.tar.gz", hash = "sha256:0212ef2727ac9caa5ca4b2c75ae89454312f440a756fcfc8ef1993e718f50f8a"},
@@ -1238,9 +1245,10 @@ files = [
 name = "isodate"
 version = "0.7.2"
 description = "An ISO 8601 date/time/duration parser and formatter"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
+markers = "extra == \"bim\" or extra == \"full\""
 files = [
     {file = "isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15"},
     {file = "isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6"},
@@ -1295,9 +1303,10 @@ files = [
 name = "lark"
 version = "1.3.1"
 description = "a modern parsing library"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"bim\" or extra == \"full\""
 files = [
     {file = "lark-1.3.1-py3-none-any.whl", hash = "sha256:c629b661023a014c37da873b4ff58a817398d12635d3bbb2c5a03be7fe5d1e12"},
     {file = "lark-1.3.1.tar.gz", hash = "sha256:b426a7a6d6d53189d318f2b6236ab5d6429eaf09259f1ca33eb716eed10d2905"},
@@ -1313,9 +1322,10 @@ regex = ["regex"]
 name = "lxml"
 version = "6.0.2"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "lxml-6.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:e77dd455b9a16bbd2a5036a63ddbd479c19572af81b624e79ef422f929eef388"},
     {file = "lxml-6.0.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:5d444858b9f07cefff6455b983aea9a67f7462ba1f6cbe4a21e8bf6791bf2153"},
@@ -1584,9 +1594,10 @@ files = [
 name = "marshmallow"
 version = "3.26.2"
 description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "extra == \"3d\" or extra == \"full\""
 files = [
     {file = "marshmallow-3.26.2-py3-none-any.whl", hash = "sha256:013fa8a3c4c276c24d26d84ce934dc964e2aa794345a0f8c7e5a7191482c8a73"},
     {file = "marshmallow-3.26.2.tar.gz", hash = "sha256:bbe2adb5a03e6e3571b573f42527c6fe926e17467833660bebd11593ab8dfd57"},
@@ -1813,14 +1824,16 @@ files = [
     {file = "mypy_extensions-1.1.0-py3-none-any.whl", hash = "sha256:1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505"},
     {file = "mypy_extensions-1.1.0.tar.gz", hash = "sha256:52e68efc3284861e772bbcd66823fde5ae21fd2fdb51c62a211403730b916558"},
 ]
+markers = {main = "extra == \"3d\" or extra == \"full\""}
 
 [[package]]
 name = "numpy"
 version = "1.26.4"
 description = "Fundamental package for array computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "extra == \"raw\" or extra == \"full\" or extra == \"3d\" or extra == \"bim\""
 files = [
     {file = "numpy-1.26.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ff0f4f29c51e2803569d7a51c2304de5554655a60c5d776e35b4a41413830d0"},
     {file = "numpy-1.26.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:2e4ee3380d6de9c9ec04745830fd9e2eccb3e6cf790d39d7b98ffd19b0dd754a"},
@@ -1864,9 +1877,10 @@ files = [
 name = "openpyxl"
 version = "3.1.5"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "openpyxl-3.1.5-py2.py3-none-any.whl", hash = "sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2"},
     {file = "openpyxl-3.1.5.tar.gz", hash = "sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050"},
@@ -1886,6 +1900,7 @@ files = [
     {file = "packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"},
     {file = "packaging-26.0.tar.gz", hash = "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"},
 ]
+markers = {main = "extra == \"3d\" or extra == \"full\""}
 
 [[package]]
 name = "passlib"
@@ -2051,9 +2066,10 @@ xmp = ["defusedxml"]
 name = "pillow-avif-plugin"
 version = "1.5.5"
 description = "A pillow plugin that adds avif support via libavif"
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"modern\" or extra == \"full\""
 files = [
     {file = "pillow_avif_plugin-1.5.5-cp27-cp27m-macosx_10_10_x86_64.whl", hash = "sha256:99dbc6483edd40fd5aae71cd63169e7be8dd891ba8534a22cc33c1e97919f779"},
     {file = "pillow_avif_plugin-1.5.5-cp27-cp27mu-manylinux2010_x86_64.whl", hash = "sha256:5c6c3d0d617aed5ec3c1ec1219c55538da67d9ebdf587bd62b0a35fb3626dc56"},
@@ -2147,9 +2163,10 @@ tests = ["packaging", "pillow", "pytest", "pytest-cov", "test-image-results"]
 name = "pillow-heif"
 version = "1.2.1"
 description = "Python interface for libheif library"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
+markers = "extra == \"modern\" or extra == \"full\""
 files = [
     {file = "pillow_heif-1.2.1-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:aef93f67030b953c401058b4735782b412787629054a4979809f721a27e74836"},
     {file = "pillow_heif-1.2.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:702f2ebf111fd13fc82c50685f0695f2bee3dd3ebd29305ddc49d6d2478e916b"},
@@ -2420,7 +2437,7 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
-markers = {main = "implementation_name != \"PyPy\"", dev = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
+markers = {main = "implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\" or (extra == \"vips\" or extra == \"full\") and implementation_name != \"PyPy\"", dev = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pydantic"
@@ -2606,9 +2623,10 @@ yaml = ["pyyaml (>=6.0.1)"]
 name = "pygltflib"
 version = "1.16.5"
 description = "Python library for reading, writing and managing 3D objects in the Khronos Group gltf and gltf2 formats."
-optional = false
+optional = true
 python-versions = ">=3.6"
 groups = ["main"]
+markers = "extra == \"3d\" or extra == \"full\""
 files = [
     {file = "pygltflib-1.16.5-py3-none-any.whl", hash = "sha256:41d3349c59dcf1586faeaee29c967be07ac2bf7cecdb8ae2b527da1f25afdaac"},
     {file = "pygltflib-1.16.5.tar.gz", hash = "sha256:1f15740d5a7aaf71a5083e285af6b361184958e255659132f4ba8fe4f3d21ea9"},
@@ -2637,9 +2655,10 @@ windows-terminal = ["colorama (>=0.4.6)"]
 name = "pymupdf"
 version = "1.27.1"
 description = "A high performance Python library for data extraction, analysis, conversion & manipulation of PDF (and other) documents."
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
+markers = "extra == \"pdf\" or extra == \"full\""
 files = [
     {file = "pymupdf-1.27.1-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:bee9f95512f9556dbf2cacfd1413c61b29a55baa07fa7f8fc83d221d8419888a"},
     {file = "pymupdf-1.27.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:3de95a0889395b0966fafd11b94980b7543a816e89dd1c218597a08543ac3415"},
@@ -2712,9 +2731,10 @@ six = ">=1.5"
 name = "python-docx"
 version = "1.2.0"
 description = "Create, read, and update Microsoft Word .docx files."
-optional = false
+optional = true
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "python_docx-1.2.0-py3-none-any.whl", hash = "sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7"},
     {file = "python_docx-1.2.0.tar.gz", hash = "sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce"},
@@ -2779,9 +2799,10 @@ files = [
 name = "python-pptx"
 version = "1.0.2"
 description = "Create, read, and update PowerPoint 2007+ (.pptx) files."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "python_pptx-1.0.2-py3-none-any.whl", hash = "sha256:160838e0b8565a8b1f67947675886e9fea18aa5e795db7ae531606d68e785cba"},
     {file = "python_pptx-1.0.2.tar.gz", hash = "sha256:479a8af0eaf0f0d76b6f00b0887732874ad2e3188230315290cd1f9dd9cc7095"},
@@ -2852,9 +2873,10 @@ dev = ["black", "build", "mypy", "pytest", "pytest-cov", "setuptools", "tox", "t
 name = "pyvips"
 version = "3.1.1"
 description = "binding for the libvips image processing library"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
+markers = "extra == \"vips\" or extra == \"full\""
 files = [
     {file = "pyvips-3.1.1.tar.gz", hash = "sha256:84fe744d023b1084ac2516bb17064cacd41c7f8aabf8e524dd383534941b9301"},
 ]
@@ -2971,9 +2993,10 @@ prompt_toolkit = ">=2.0,<4.0"
 name = "rawpy"
 version = "0.26.1"
 description = "RAW image processing for Python, a wrapper for libraw"
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"raw\" or extra == \"full\""
 files = [
     {file = "rawpy-0.26.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ec84ea9b6ca2a0eae97f5a4a91f17f500d57edc2cba51ab394e0cb44871ddd42"},
     {file = "rawpy-0.26.1-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d9e8c31f82bb9556febe4d7bd188de22f8b5429614458cf491de12107ec32781"},
@@ -3083,9 +3106,10 @@ crt = ["botocore[crt] (>=1.37.4,<2.0a0)"]
 name = "shapely"
 version = "2.1.2"
 description = "Manipulation and analysis of geometric objects"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
+markers = "extra == \"bim\" or extra == \"full\""
 files = [
     {file = "shapely-2.1.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:7ae48c236c0324b4e139bea88a306a04ca630f49be66741b340729d380d8f52f"},
     {file = "shapely-2.1.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:eba6710407f1daa8e7602c347dfc94adc02205ec27ed956346190d66579eb9ea"},
@@ -3215,9 +3239,10 @@ files = [
 name = "trimesh"
 version = "4.11.2"
 description = "Import, export, process, analyze and view triangular meshes."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"3d\" or extra == \"full\""
 files = [
     {file = "trimesh-4.11.2-py3-none-any.whl", hash = "sha256:25e3ab2620f9eca5c9376168c67aabdd32205dad1c4eea09cd45cd4a3edf775a"},
     {file = "trimesh-4.11.2.tar.gz", hash = "sha256:30fbde5b8dd7c157e7ff4d54286cb35291844fd3f4d0364e8b2727f1b308fb06"},
@@ -3251,9 +3276,10 @@ markers = {dev = "python_version < \"3.13\""}
 name = "typing-inspect"
 version = "0.9.0"
 description = "Runtime inspection utilities for typing module."
-optional = false
+optional = true
 python-versions = "*"
 groups = ["main"]
+markers = "extra == \"3d\" or extra == \"full\""
 files = [
     {file = "typing_inspect-0.9.0-py3-none-any.whl", hash = "sha256:9ee6fc59062311ef8547596ab6b955e1b8aa46242d854bfc78f4f6b0eff35f9f"},
     {file = "typing_inspect-0.9.0.tar.gz", hash = "sha256:b23fc42ff6f6ef6954e4852c1fb512cdd18dbea03134f91f856a95ccc9461f78"},
@@ -3440,9 +3466,10 @@ files = [
 name = "xlsxwriter"
 version = "3.2.9"
 description = "A Python module for creating Excel XLSX files."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
+markers = "extra == \"office\" or extra == \"full\""
 files = [
     {file = "xlsxwriter-3.2.9-py3-none-any.whl", hash = "sha256:9a5db42bc5dff014806c58a20b9eae7322a134abb6fce3c92c181bfb275ec5b3"},
     {file = "xlsxwriter-3.2.9.tar.gz", hash = "sha256:254b1c37a368c444eac6e2f867405cc9e461b0ed97a3233b2ac1e574efb4140c"},
@@ -3608,7 +3635,18 @@ idna = ">=2.0"
 multidict = ">=4.0"
 propcache = ">=0.2.1"
 
+[extras]
+3d = ["pygltflib", "trimesh"]
+bim = ["ifcopenshell"]
+full = ["ffmpeg-python", "ifcopenshell", "imageio", "numpy", "openpyxl", "pillow-avif-plugin", "pillow-heif", "pygltflib", "pymupdf", "python-docx", "python-pptx", "pyvips", "rawpy", "trimesh"]
+modern = ["pillow-avif-plugin", "pillow-heif"]
+office = ["openpyxl", "python-docx", "python-pptx"]
+pdf = ["pymupdf"]
+raw = ["imageio", "numpy", "rawpy"]
+video = ["ffmpeg-python"]
+vips = ["pyvips"]
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.15"
-content-hash = "0e2698da4ba46ad9acfb46132879cef189be7c8ac8862514b3dd31a20abc3692"
+content-hash = "ec02044f044265fa068794f2489c8e42b407b0a66be74264e019406df9c01153"
