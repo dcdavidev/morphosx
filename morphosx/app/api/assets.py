@@ -74,25 +74,33 @@ BIM_EXTENSIONS = {".ifc"}
 async def upload_asset(
     file: UploadFile = File(...),
     private: bool = Query(False),
+    folder: Optional[str] = Query(None),
     current_user: Optional[str] = Depends(get_current_user)
 ):
     """
     Upload a new asset.
-    - If 'private=True' and user is logged in: saved to 'users/{user_id}/' (PROTECTED)
-    - Otherwise: saved to 'originals/' (PUBLIC)
+    - If 'private=True' and user is logged in: saved to 'users/{user_id}/{folder}/'
+    - Otherwise: saved to 'originals/{folder}/'
     """
     asset_uuid = str(uuid.uuid4())
     ext = guess_extension(file.content_type) or ".bin"
     
-    # Determine destination and prefix
+    # Determine base prefix
     if private:
         if not current_user:
             raise HTTPException(status_code=401, detail="Authentication required for private uploads")
-        folder_prefix = f"users/{current_user}"
+        base_prefix = f"users/{current_user}"
     else:
-        folder_prefix = "originals"
-        
-    asset_id = f"{folder_prefix}/{asset_uuid}{ext}"
+        base_prefix = "originals"
+    
+    # Sanitize and add custom folder if provided
+    path_parts = [base_prefix]
+    if folder:
+        sanitized_folder = folder.strip("/")
+        if sanitized_folder:
+            path_parts.append(sanitized_folder)
+            
+    asset_id = f"{'/'.join(path_parts)}/{asset_uuid}{ext}"
 
     try:
         content = await file.read()
@@ -303,5 +311,36 @@ async def get_processed_asset(
         
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Asset not found")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+            except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+    
+    
+    @router.get("/list/{path:path}")
+    async def list_assets(
+        path: str = "",
+        current_user: Optional[str] = Depends(get_current_user)
+    ):
+        """
+        List files and folders in a given path.
+        """
+        # Security: If path starts with users/, verify ownership
+        if path.startswith("users/"):
+            parts = path.split("/")
+            if len(parts) >= 2:
+                owner_id = parts[1]
+                if current_user != owner_id:
+                    raise HTTPException(status_code=403, detail="Not authorized to browse this folder")
+        
+        # If path is empty, default to listing 'originals/' (public root)
+        if not path:
+            path = "originals"
+    
+        try:
+            items = await storage.list_assets(path)
+            return {
+                "path": path,
+                "items": items
+            }
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Listing failed: {str(e)}")
+    

@@ -66,3 +66,41 @@ class S3Storage(BaseStorage):
                 return asset_id
             except Exception as e:
                 raise RuntimeError(f"S3 save_asset failed: {str(e)}")
+
+    async def list_assets(self, prefix: str) -> list[dict]:
+        """
+        List objects in S3 bucket with a specific prefix.
+        """
+        if prefix and not prefix.endswith("/"):
+            prefix += "/"
+            
+        async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:
+            try:
+                paginator = s3.get_paginator("list_objects_v2")
+                results = []
+                
+                async for page in paginator.paginate(Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"):
+                    # Add CommonPrefixes (Folders)
+                    for folder in page.get("CommonPrefixes", []):
+                        results.append({
+                            "name": folder["Prefix"].split("/")[-2],
+                            "path": folder["Prefix"],
+                            "is_dir": True,
+                            "size": None,
+                            "modified": None
+                        })
+                    
+                    # Add Contents (Files)
+                    for obj in page.get("Contents", []):
+                        if obj["Key"] == prefix: # Skip the folder itself
+                            continue
+                        results.append({
+                            "name": obj["Key"].split("/")[-1],
+                            "path": obj["Key"],
+                            "is_dir": False,
+                            "size": obj["Size"],
+                            "modified": obj["LastModified"].timestamp()
+                        })
+                return results
+            except Exception as e:
+                raise RuntimeError(f"S3 list_assets failed: {str(e)}")

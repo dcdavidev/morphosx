@@ -29,3 +29,13 @@ class BaseStorage(ABC):
         :return: The final asset_id (or path) where it was saved.
         """
         pass
+
+    @abstractmethod
+    async def list_assets(self, prefix: str) -> list[dict]:
+        """
+        List assets and sub-folders starting with a given prefix.
+        
+        :param prefix: The folder path to list.
+        :return: A list of metadata dicts (name, type, size, etc.)
+        """
+        pass

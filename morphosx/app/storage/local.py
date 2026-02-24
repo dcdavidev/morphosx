@@ -55,3 +55,30 @@ class LocalStorage(BaseStorage):
             await f.write(data)
             
         return asset_id
+
+    async def list_assets(self, prefix: str) -> list[dict]:
+        """
+        List files and directories in a local path.
+        """
+        folder_path = (self.base_dir / prefix).resolve()
+        
+        if not str(folder_path).startswith(str(self.base_dir)):
+            raise PermissionError("Access outside base directory is denied.")
+            
+        if not folder_path.exists():
+            return []
+
+        results = []
+        import os
+        # We use os.scandir for efficiency
+        for entry in os.scandir(folder_path):
+            stat = entry.stat()
+            results.append({
+                "name": entry.name,
+                "path": str(Path(prefix) / entry.name),
+                "is_dir": entry.is_dir(),
+                "size": stat.st_size if entry.is_file() else None,
+                "modified": stat.st_mtime
+            })
+            
+        return results
