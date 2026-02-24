@@ -6,40 +6,36 @@
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
 
-`morphosx` is a high-speed, minimal cloud storage and media manipulation server. It focuses on extreme efficiency, asynchronous processing, and secure distribution across multiple media types.
+`morphosx` is a high-speed, minimal cloud storage and media manipulation server. It converts almost any media type into a optimized, web-ready image derivative on-the-fly.
 
 ---
 
 ## ⚡ Features
 
-- **On-the-fly Image Processing**: Resize, reformat (WebP, JPEG, PNG), and optimize images in memory.
-- **Video Thumbnails**: Extract high-quality frames from video files (MP4, WEBM, MOV, AVI) at any given timestamp.
-- **Audio Waveforms**: Generate visual representations of audio tracks (MP3, WAV, OGG, FLAC) as processed images.
-- **Document Rendering**: Convert PDF pages into crisp images for easy previewing.
-- **RAW Development**: Professional RAW image decoding (CR2, NEF, DNG, ARW) with camera white-balance support.
-- **Cyber-Security**: HMAC-SHA256 URL signing to prevent DoS attacks and unauthorized derivative generation.
-- **Async Engine**: Built with **FastAPI**, leveraging `aiofiles` and non-blocking I/O.
-- **Derivative Caching**: Process once, serve forever. Intelligent caching of transformed variants.
-- **Zero-Disk I/O Pipeline**: Most transformations happen entirely in RAM using `BytesIO` buffers.
+- **Modern Image Formats**: Support for **HEIC/HEIF** and **AVIF** out of the box.
+- **Office Previews**: Generate summary cards for **DOCX, PPTX, and XLSX** files.
+- **Font Specimen**: Create beautiful previews for **TTF and OTF** font files.
+- **3D Blueprints**: Technical metadata and bounding-box summaries for **STL, OBJ, and GLB**.
+- **Archive Contents**: List files inside **ZIP and TAR** archives as a folder-style image.
+- **Video Thumbnails**: Extract high-quality frames from video files (MP4, WEBM, MOV, AVI).
+- **Audio Waveforms**: Generate visual representations of audio tracks (MP3, WAV, OGG, FLAC).
+- **Document Rendering**: Convert **PDF** pages into crisp images.
+- **RAW Development**: Professional RAW image decoding (CR2, NEF, DNG, ARW).
+- **Modern Rendering Engines**: Choice between **Pillow** (stable) and **PyVips** (ultra-fast).
+- **Cloud Ready**: Pluggable storage system supporting **Local Filesystem** and **Amazon S3**.
+- **Cyber-Security**: HMAC-SHA256 URL signing for secure distribution.
 
 ## 🛠️ Tech Stack
 
-- **Language**: Python 3.11+ (Strict typing)
-- **Framework**: FastAPI (Asynchronous)
-- **Engines**: 
-  - **Pillow**: Core image manipulation.
-  - **FFmpeg**: Video frame extraction.
-  - **PyMuPDF**: PDF rendering.
-  - **rawpy**: Professional RAW decoding.
-- **Settings**: Pydantic-settings (Environment-based)
-- **Storage**: Extensible adapter system (Local Filesystem, S3 planned).
+- **Engines**: Pillow, PyVips, FFmpeg, PyMuPDF, rawpy, trimesh, python-docx, etc.
+- **Core**: FastAPI, aioboto3, pydantic-settings.
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
-Ensure you have [Poetry](https://python-poetry.org/) and **FFmpeg** installed on your system.
+Ensure you have [Poetry](https://python-poetry.org/) and **FFmpeg** installed. For PyVips support, install `libvips`.
 
 ### 2. Installation
 ```bash
@@ -49,51 +45,33 @@ poetry install
 ```
 
 ### 3. Setup Environment
-Create a `.env` file or export variables:
 ```bash
-MORPHOSX_SECRET_KEY="your-cyber-secret-key"
-MORPHOSX_DEBUG=True
+MORPHOSX_SECRET_KEY="your-secret"
+MORPHOSX_STORAGE_TYPE="local" # or "s3"
+MORPHOSX_ENGINE_TYPE="pillow" # or "vips"
 ```
 
 ### 4. Run the Engine
 ```bash
 poetry run start
 ```
-The server will be available at `http://localhost:8000`.
 
 ---
 
-## 🧪 API Usage
+## 🧪 Supported Media Types
 
-### Upload an Asset
-```bash
-curl -X POST "http://localhost:8000/v1/assets/upload" \
-     -F "file=@your-media.jpg"
-```
-*Returns an `asset_id` and a signed URL.*
-
-### Request a Variant
-```text
-GET /v1/assets/{asset_id}?width=300&format=webp&signature={hmac}
-```
-
-- **Video frame**: Add `time=2.5` to get the frame at 2.5 seconds.
-- **PDF page**: Add `page=2` to render the second page.
-- **Audio waveform**: Request a width/height to get the generated waveform.
+| Type | Extensions | Output |
+| :--- | :--- | :--- |
+| **Images** | jpg, png, webp, heic, avif | Processed Image |
+| **Video** | mp4, mov, webm, avi | Frame @ timestamp |
+| **Audio** | mp3, wav, ogg, flac | Waveform Image |
+| **Docs** | pdf, docx, pptx, xlsx | Rendered Page/Summary |
+| **Text** | json, xml, md, txt | Syntax-highlighted Image |
+| **3D** | stl, obj, glb | Technical Blueprint |
+| **Fonts** | ttf, otf | Specimen Image |
+| **Archives** | zip, tar | Content List Image |
 
 ---
-
-## 📁 Structure
-```text
-morphosx/
-├── app/
-│   ├── api/        # FastAPI Routers
-│   ├── core/       # Security & Logic
-│   ├── engine/     # Specialized Engines (Video, Audio, PDF, RAW)
-│   ├── storage/    # Storage Adapters (Local/S3)
-│   └── settings.py # Centralized Config
-└── data/           # Originals and Cache
-```
 
 ## 📜 License
 MIT - Built for the OSS community.
