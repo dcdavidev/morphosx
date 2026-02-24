@@ -1,6 +1,6 @@
 [project]
 name = "morphosx"
-version = "0.2.0"
+version = "0.3.0"
 description = "high-performance oss cloud storage. self-host your assets with lightning-fast on-the-fly image processing and delivery."
 authors = [
     {name = "Davide Di Criscito"}
@@ -64,7 +64,7 @@ line_length = 88
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2.0"
+version = "0.3.0"
 version_files = [
     "pyproject.toml:version"
 ]

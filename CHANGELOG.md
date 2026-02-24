@@ -1,3 +1,14 @@
+## v0.3.0 (2026-02-24)
+
+### Feat
+
+- add GitHub Actions workflow for Docker publishing on tag push
+- add Dockerfile for containerized deployment
+
+### Fix
+
+- correct Dockerfile syntax for multi-line instructions
+
 ## v0.2.0 (2026-02-24)
 
 ### Feat
