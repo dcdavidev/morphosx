@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     base_dir: Path = Path(__file__).resolve().parent.parent.parent
     storage_root: str = str(base_dir / "data")
     
+    # --- STORAGE BACKEND ---
+    # Choice: 'local' or 's3'
+    storage_type: str = "local"
+    s3_bucket: Optional[str] = None
+    s3_region: str = "us-east-1"
+    s3_endpoint: Optional[str] = None
+    s3_access_key: Optional[str] = None
+    s3_secret_key: Optional[str] = None
+    
     @property
     def originals_dir(self) -> str:
         return str(Path(self.storage_root) / "originals")
@@ -34,7 +43,9 @@ class Settings(BaseSettings):
     def cache_dir(self) -> str:
         return str(Path(self.storage_root) / "cache")
     
-    # --- IMAGE & MEDIA ENGINE DEFAULTS ---
+    # --- IMAGE & MEDIA ENGINE ---
+    # Choice: 'pillow' or 'vips'
+    engine_type: str = "pillow"
     default_quality: int = 80
     max_image_dimension: int = 4096
     allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw"]

@@ -10,19 +10,39 @@ from morphosx.app.engine.video import VideoProcessor
 from morphosx.app.engine.audio import AudioProcessor
 from morphosx.app.engine.document import DocumentProcessor
 from morphosx.app.engine.raw import RawProcessor
+from morphosx.app.engine.vips import VipsProcessor
 from morphosx.app.storage.local import LocalStorage
+from morphosx.app.storage.s3 import S3Storage
 from morphosx.app.settings import settings
 
 
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
-# Singleton instances
-processor = ImageProcessor()
+# Singleton instances factory
+def get_storage():
+    if settings.storage_type == "s3":
+        if not settings.s3_bucket:
+            raise ValueError("S3_BUCKET is required for s3 storage_type")
+        return S3Storage(
+            bucket_name=settings.s3_bucket,
+            region_name=settings.s3_region,
+            endpoint_url=settings.s3_endpoint,
+            access_key_id=settings.s3_access_key,
+            secret_access_key=settings.s3_secret_key
+        )
+    return LocalStorage(base_directory=settings.storage_root)
+
+def get_processor():
+    if settings.engine_type == "vips":
+        return VipsProcessor()
+    return ImageProcessor()
+
+storage = get_storage()
+processor = get_processor()
 video_processor = VideoProcessor()
 audio_processor = AudioProcessor()
 document_processor = DocumentProcessor()
 raw_processor = RawProcessor()
-storage = LocalStorage(base_directory=settings.storage_root)
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
