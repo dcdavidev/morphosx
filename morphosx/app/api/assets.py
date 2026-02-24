@@ -8,6 +8,7 @@ from morphosx.app.core.security import verify_signature, generate_signature
 from morphosx.app.engine.processor import ImageProcessor, ProcessingOptions, ImageFormat
 from morphosx.app.engine.video import VideoProcessor
 from morphosx.app.engine.audio import AudioProcessor
+from morphosx.app.engine.document import DocumentProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.settings import settings
 
@@ -18,10 +19,13 @@ router = APIRouter(prefix="/assets", tags=["Assets"])
 processor = ImageProcessor()
 video_processor = VideoProcessor()
 audio_processor = AudioProcessor()
+document_processor = DocumentProcessor()
 storage = LocalStorage(base_directory=settings.storage_root)
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
+DOCUMENT_EXTENSIONS = {".pdf"}
+
 
 
 @router.post("/upload")
@@ -73,11 +77,12 @@ async def get_processed_asset(
     fmt: Optional[ImageFormat] = Query(None, alias="format"),
     q: int = Query(settings.default_quality, alias="quality", ge=1, le=100),
     t: float = Query(0.0, alias="time", ge=0.0),
+    p: int = Query(1, alias="page", ge=1),
     s: str = Query(..., alias="signature", description="HMAC-SHA256 signature"),
 ):
     """
     Retrieve and process an asset.
-    If it's a video, extract a frame (thumbnail) first, then process it as an image.
+    If it's a video, extract a frame. If it's a document, extract a page.
     """
     # 1. Signature Verification (SECURITY FIRST)
     fmt_val = fmt if fmt else ImageFormat.WEBP
@@ -101,11 +106,15 @@ async def get_processed_asset(
         quality=q
     )
     
-    # 2. Define Cache Paths (Include timestamp 't' for video derivatives)
+    # 2. Define Cache Paths (Include timestamp or page for media derivatives)
     cache_key = options.get_cache_key()
     is_video = Path(asset_id).suffix.lower() in VIDEO_EXTENSIONS
+    is_document = Path(asset_id).suffix.lower() in DOCUMENT_EXTENSIONS
+    
     if is_video:
         cache_key = f"t{t}_{cache_key}"
+    elif is_document:
+        cache_key = f"p{p}_{cache_key}"
 
     derivative_id = f"cache/{asset_id}/{cache_key}"
 
@@ -140,6 +149,11 @@ async def get_processed_asset(
             # Audio: Generate Waveform -> Process as Image
             waveform_bytes = audio_processor.generate_waveform(source_bytes, w or 800, h or 200)
             processed_data, mime_type = processor.process(waveform_bytes, options)
+        elif is_document:
+            # Document: Extract Page -> Process as Image
+            # We extract at 150 DPI to ensure crisp text before potential downscaling
+            page_bytes = document_processor.extract_page_as_image(source_bytes, p, dpi=150)
+            processed_data, mime_type = processor.process(page_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
