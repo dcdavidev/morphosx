@@ -6,46 +6,49 @@
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
 
-`morphosx` is a high-performance media processing server designed to convert almost any file type into web-optimized image derivatives in real-time. It handles storage, security via HMAC signatures, and efficient distribution of multimedia assets.
+`morphosx` is a high-speed, minimal cloud storage and media manipulation server. It converts almost any media type into a optimized, web-ready image derivative on-the-fly.
 
 ---
 
 ## ⚡ Core Features
 
-### 🖼️ Universal Image Engine
-- **Live Transformations**: Resizing, format switching, and in-memory compression.
-- **Modern Formats**: Native support for **HEIC/HEIF** (iPhone) and **AVIF** (Next-gen).
-- **RAW Development**: Professional processing of photographic raw files (**CR2, NEF, DNG, ARW**) with camera white balance support.
-- **Vector Rendering**: Raster preview generation from **SVG** files.
-
-### 🎬 Media & Documents
-- **Video Thumbnails**: High-precision frame extraction from **MP4, WEBM, MOV, AVI** using the `time` parameter.
-- **Audio Waveforms**: Visual waveform generation for **MP3, WAV, OGG, FLAC**.
-- **PDF Rendering**: Conversion of specific pages into sharp images (using the `page` parameter).
-- **Office Cards**: Summary card generation for **DOCX, PPTX, XLSX** with key text extraction.
-
-### 🏗️ Engineering & Design
-- **BIM Technical Cards**: Architectural metadata extraction (walls, floors, windows) from **IFC** files.
-- **3D Blueprints**: Technical sheets with bounding boxes and metadata for **STL, OBJ, GLB, GLTF**.
-- **Font Specimen**: Generation of complete typographic specimens from **TTF** and **OTF** files.
-- **Archive Explorer**: Content visualization for **ZIP** and **TAR** archives in a "folder preview" format.
-
-### 🚀 Performance & Architecture
-- **Dual Engine**: Choose between **Pillow** (stability) or **PyVips** (extreme speed for large files) via `MORPHOSX_ENGINE_TYPE`.
-- **Modular Storage**: Support for **Local Filesystem** and **Amazon S3** (or S3-compatible providers like MinIO/DigitalOcean).
-- **Zero-Disk I/O**: Entire processing pipeline runs in RAM using `BytesIO` buffers.
-- **Intelligent Caching**: Derivatives are computed once and served instantly for subsequent requests.
+- **User-Bound Security**: Protected assets and HMAC signatures tied to specific **JWT-authenticated** users.
+- **Private Folders**: Secure per-user storage using the `users/{user_id}/` path convention.
+- **BIM & Architecture**: Technical Building Data Cards for **IFC** files (using IfcOpenShell).
+- **3D & CAD Support**: Blueprints and metadata for **STL, OBJ, GLB, and GLTF**.
+- **Modern Image Formats**: Support for **HEIC/HEIF** and **AVIF**.
+- **Office Previews**: Summary cards for **DOCX, PPTX, and XLSX**.
+- **Font Specimen**: Previews for **TTF and OTF** font files.
+- **Archive Contents**: Visual content list for **ZIP and TAR**.
+- **Media Engine**: Frame extraction from **Video** and waveforms from **Audio**.
+- **Document Rendering**: **PDF** page-to-image conversion.
+- **RAW Development**: Professional decoding for **CR2, NEF, DNG, ARW**.
+- **Modern Rendering Engines**: Choice between **Pillow** and **PyVips**.
+- **Cloud Ready**: Pluggable storage system supporting **Local Filesystem** and **Amazon S3**.
 
 ---
 
-## 🛡️ Security: HMAC-SHA256
-MorphosX protects your resources by preventing unauthorized variant generation (protecting against DoS attacks). Every URL must be signed with an HMAC that includes:
-`asset_id | width | height | format | quality | preset`
+## 🛡️ Advanced Security & Authentication
+
+MorphosX features a multi-layer security model to protect your assets.
+
+### 1. JWT Authentication
+The engine supports **Bearer JWT** tokens. If a request includes a valid token in the `Authorization` header, MorphosX identifies the `user_id` from the `sub` claim.
+
+### 2. User-Bound HMAC Signatures
+Signatures can be tied to a specific user. A signed URL generated for User A will be rejected if accessed by User B, even for the same asset and parameters.
+The signature payload includes: `asset_id | width | height | format | quality | preset | user_id`
+
+### 3. Private Assets
+Assets stored under the `users/{user_id}/` path are strictly private. Access is only granted if:
+1. The requester is authenticated via a valid JWT.
+2. The `user_id` in the token matches the owner ID in the path.
+3. The HMAC signature correctly validates against that specific `user_id`.
 
 ---
 
 ## ✨ Smart Presets
-Instead of sending complex parameters, you can use predefined aliases in `settings.py`:
+Use predefined aliases in `settings.py` for cleaner URLs:
 - `preset=thumb`: 150x150 WebP (Ideal for avatars/thumbnails).
 - `preset=hero`: 1920px WebP (Ideal for banners).
 - `preset=social`: 1200x630 JPEG (Ideal for OpenGraph/Social sharing).
@@ -57,7 +60,7 @@ Instead of sending complex parameters, you can use predefined aliases in `settin
 ### 1. Prerequisites
 - **Python 3.11 - 3.14**
 - **FFmpeg** (for video and audio)
-- **libvips** (optional, for ultra-high performance)
+- **libvips** (optional)
 
 ### 2. Installation
 ```bash
@@ -84,29 +87,17 @@ poetry run start
 
 | Category | Extensions | Output Type |
 | :--- | :--- | :--- |
+| **BIM** | ifc | Technical Project Card |
+| **3D** | stl, obj, glb, gltf | Technical Blueprint |
 | **Images** | jpg, png, webp, heic, avif | Processed Image |
 | **Video** | mp4, mov, webm, avi | Frame @ timestamp |
 | **Audio** | mp3, wav, ogg, flac | Waveform Image |
-| **Documents** | pdf, docx, pptx, xlsx | Page Render / Summary |
-| **BIM** | ifc | Technical Project Card |
-| **3D / CAD** | stl, obj, glb, gltf | Technical Blueprint |
-| **Text / Code**| json, xml, md, txt | Syntax-highlighted Image |
-| **Typography** | ttf, otf | Font Specimen Image |
+| **Docs** | pdf, docx, pptx, xlsx | Page Render / Summary |
+| **Text** | json, xml, md, txt | Syntax-highlighted Image |
+| **Fonts** | ttf, otf | Specimen Image |
 | **Archives** | zip, tar | Content List Image |
 
 ---
-
-## 📁 Project Structure
-```text
-morphosx/
-├── app/
-│   ├── api/        # FastAPI Endpoints
-│   ├── core/       # Security & HMAC Signing
-│   ├── engine/     # Specialized Engines (Video, 3D, BIM, etc.)
-│   ├── storage/    # Local and S3 Adapters
-│   └── settings.py # Centralized Configuration
-└── data/           # Original assets and Derivative Cache
-```
 
 ## 📜 License
 MIT - Built for the Open Source community.

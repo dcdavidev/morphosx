@@ -10,7 +10,8 @@ def generate_signature(
     format: str,
     quality: int,
     secret_key: str,
-    preset: Optional[str] = None
+    preset: Optional[str] = None,
+    user_id: Optional[str] = None
 ) -> str:
     """
     Generate an HMAC-SHA256 signature for image transformation parameters.
@@ -22,11 +23,12 @@ def generate_signature(
     :param quality: Output quality (e.g. 80).
     :param secret_key: The server-side secret key.
     :param preset: Optional preset name (e.g. 'thumb').
+    :param user_id: Optional user identifier for protected assets.
     :return: Hexadecimal signature string (first 16 chars for brevity).
     """
     # Create a canonical representation of the transformation parameters
     # This ensures consistency: order matters!
-    payload = f"{asset_id}|w{width}|h{height}|f{format}|q{quality}|p{preset}"
+    payload = f"{asset_id}|w{width}|h{height}|f{format}|q{quality}|p{preset}|u{user_id}"
     
     signature = hmac.new(
         secret_key.encode('utf-8'),
@@ -46,12 +48,13 @@ def verify_signature(
     quality: int,
     signature_to_verify: str,
     secret_key: str,
-    preset: Optional[str] = None
+    preset: Optional[str] = None,
+    user_id: Optional[str] = None
 ) -> bool:
     """
     Check if a provided signature matches the expected signature for those parameters.
     """
-    expected = generate_signature(asset_id, width, height, format, quality, secret_key, preset)
+    expected = generate_signature(asset_id, width, height, format, quality, secret_key, preset, user_id)
     
     # Use hmac.compare_digest to prevent timing attacks
     return hmac.compare_digest(expected, signature_to_verify)

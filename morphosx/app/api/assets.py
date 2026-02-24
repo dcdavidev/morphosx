@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFile, File
 
 from morphosx.app.core.security import verify_signature, generate_signature
+from morphosx.app.core.auth import get_current_user
 from morphosx.app.engine.processor import ImageProcessor, ProcessingOptions, ImageFormat
 from morphosx.app.engine.video import VideoProcessor
 from morphosx.app.engine.audio import AudioProcessor
@@ -121,10 +122,11 @@ async def get_processed_asset(
     t: float = Query(0.0, alias="time", ge=0.0),
     p: int = Query(1, alias="page", ge=1),
     s: str = Query(..., alias="signature", description="HMAC-SHA256 signature"),
+    current_user: Optional[str] = Depends(get_current_user),
 ):
     """
     Retrieve and process an asset.
-    Supports Smart Presets for quick transformation aliases.
+    Supports Smart Presets and User-bound protected assets.
     """
     # 0. Apply Preset Logic
     target_w = w
@@ -144,6 +146,18 @@ async def get_processed_asset(
         target_q = q if q else config.get("quality", settings.default_quality)
 
     # 1. Signature Verification (SECURITY FIRST)
+    # We enforce that if an asset is in the "users/" directory, it MUST have a matching current_user
+    is_private = asset_id.startswith("users/")
+    if is_private:
+        # Extract owner ID from path: "users/{user_id}/file.jpg"
+        parts = asset_id.split("/")
+        if len(parts) < 3:
+             raise HTTPException(status_code=400, detail="Invalid private asset path")
+        
+        owner_id = parts[1]
+        if current_user != owner_id:
+             raise HTTPException(status_code=403, detail="Not authorized to access this private asset")
+
     is_valid = verify_signature(
         asset_id=asset_id,
         width=w, 
@@ -152,7 +166,8 @@ async def get_processed_asset(
         quality=q if q else 0,
         signature_to_verify=s,
         secret_key=settings.secret_key,
-        preset=preset
+        preset=preset,
+        user_id=current_user
     )
     
     if not is_valid:
