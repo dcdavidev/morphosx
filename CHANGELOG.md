@@ -1,3 +1,9 @@
+## v0.4.0 (2026-02-24)
+
+### Feat
+
+- add GitHub Actions workflow for PyPI publishing
+
 ## v0.3.0 (2026-02-24)
 
 ### Feat
