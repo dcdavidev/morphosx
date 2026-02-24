@@ -5,7 +5,7 @@ description = "high-performance oss cloud storage. self-host your assets with li
 authors = [
     {name = "Davide Di Criscito"}
 ]
-requires-python = "^3.11"
+requires-python = ">=3.11,<3.15"
 dependencies = [
     "fastapi (>=0.132.0,<0.133.0)",
     "uvicorn (>=0.41.0,<0.42.0)",
@@ -27,7 +27,9 @@ dependencies = [
     "python-docx (>=1.2.0,<2.0.0)",
     "python-pptx (>=1.0.2,<2.0.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
-    "trimesh (>=4.11.2,<5.0.0)"
+    "trimesh (>=4.11.2,<5.0.0)",
+    "ifcopenshell (>=0.8.4.post1,<0.9.0)",
+    "pygltflib (>=1.16.5,<2.0.0)"
 ]
 
 [project.scripts]
