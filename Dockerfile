@@ -1,20 +1,20 @@
 # --- STAGE 1: Builder ---
 FROM python:3.12-slim AS builder
 
-ENV PYTHONUNBUFFERED=1 
-    PYTHONDONTWRITEBYTECODE=1 
-    POETRY_VERSION=2.0.1 
-    POETRY_HOME="/opt/poetry" 
-    POETRY_VIRTUALENVS_CREATE=false 
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    POETRY_VERSION=2.0.1 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
 
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends 
-    build-essential 
-    curl 
-    libvips-dev 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    libvips-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
@@ -37,9 +37,9 @@ WORKDIR /app
 # Install runtime system dependencies
 # ffmpeg: for video/audio processing
 # libvips: for high-performance image engine
-RUN apt-get update && apt-get install -y --no-install-recommends 
-    ffmpeg 
-    libvips 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libvips \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed python packages from builder
@@ -56,7 +56,7 @@ RUN mkdir -p data/originals data/cache data/users
 EXPOSE 8000
 
 # Set environment defaults
-ENV MORPHOSX_STORAGE_TYPE="local" 
+ENV MORPHOSX_STORAGE_TYPE="local" \
     MORPHOSX_ENGINE_TYPE="pillow"
 
 # Run the application
