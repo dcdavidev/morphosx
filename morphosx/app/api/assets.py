@@ -15,6 +15,7 @@ from morphosx.app.engine.text import TextProcessor
 from morphosx.app.engine.office import OfficeProcessor
 from morphosx.app.engine.font import FontProcessor
 from morphosx.app.engine.model3d import Model3DProcessor
+from morphosx.app.engine.archive import ArchiveProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.storage.s3 import S3Storage
 from morphosx.app.settings import settings
@@ -51,6 +52,7 @@ text_processor = TextProcessor()
 office_processor = OfficeProcessor()
 font_processor = FontProcessor()
 model3d_processor = Model3DProcessor()
+archive_processor = ArchiveProcessor()
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
@@ -60,6 +62,7 @@ TEXT_EXTENSIONS = {".json", ".xml", ".md"}
 OFFICE_EXTENSIONS = {".docx", ".pptx", ".xlsx"}
 FONT_EXTENSIONS = {".ttf", ".otf"}
 MODEL3D_EXTENSIONS = {".stl", ".obj", ".glb"}
+ARCHIVE_EXTENSIONS = {".zip", ".tar", ".gz"}
 
 
 
@@ -180,6 +183,7 @@ async def get_processed_asset(
         is_office = Path(asset_id).suffix.lower() in OFFICE_EXTENSIONS
         is_font = Path(asset_id).suffix.lower() in FONT_EXTENSIONS
         is_model3d = Path(asset_id).suffix.lower() in MODEL3D_EXTENSIONS
+        is_archive = Path(asset_id).suffix.lower() in ARCHIVE_EXTENSIONS
 
         if is_video:
             # Video: Extract Frame -> Process as Image
@@ -214,6 +218,10 @@ async def get_processed_asset(
             # 3D: Generate Blueprint -> Process as Image
             model_bytes = model3d_processor.render_thumbnail(source_bytes, asset_id)
             processed_data, mime_type = processor.process(model_bytes, options)
+        elif is_archive:
+            # Archive: Generate Content List -> Process as Image
+            archive_bytes = archive_processor.render_thumbnail(source_bytes, asset_id)
+            processed_data, mime_type = processor.process(archive_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
