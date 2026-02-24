@@ -11,6 +11,7 @@ from morphosx.app.engine.audio import AudioProcessor
 from morphosx.app.engine.document import DocumentProcessor
 from morphosx.app.engine.raw import RawProcessor
 from morphosx.app.engine.vips import VipsProcessor
+from morphosx.app.engine.text import TextProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.storage.s3 import S3Storage
 from morphosx.app.settings import settings
@@ -43,11 +44,13 @@ video_processor = VideoProcessor()
 audio_processor = AudioProcessor()
 document_processor = DocumentProcessor()
 raw_processor = RawProcessor()
+text_processor = TextProcessor()
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
 DOCUMENT_EXTENSIONS = {".pdf"}
 RAW_EXTENSIONS = {".cr2", ".nef", ".dng", ".arw"}
+TEXT_EXTENSIONS = {".json", ".xml", ".md"}
 
 
 
@@ -164,6 +167,7 @@ async def get_processed_asset(
         # 6. Transform Pipeline
         is_audio = Path(asset_id).suffix.lower() in AUDIO_EXTENSIONS
         is_raw = Path(asset_id).suffix.lower() in RAW_EXTENSIONS
+        is_text = Path(asset_id).suffix.lower() in TEXT_EXTENSIONS
 
         if is_video:
             # Video: Extract Frame -> Process as Image
@@ -182,6 +186,10 @@ async def get_processed_asset(
             # RAW: Extract Preview -> Process as Image
             preview_bytes = raw_processor.extract_preview(source_bytes)
             processed_data, mime_type = processor.process(preview_bytes, options)
+        elif is_text:
+            # Text: Render to Image -> Process as Image
+            rendered_bytes = text_processor.render_to_image(source_bytes, asset_id, options)
+            processed_data, mime_type = processor.process(rendered_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
