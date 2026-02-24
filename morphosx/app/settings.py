@@ -50,6 +50,15 @@ class Settings(BaseSettings):
     max_image_dimension: int = 4096
     allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw", "json", "xml", "md", "heic", "heif", "avif", "docx", "pptx", "xlsx", "ttf", "otf", "stl", "obj", "glb", "zip", "tar", "ifc", "gltf"]
     
+    # --- SMART PRESETS ---
+    # Predefined transformation aliases
+    presets: dict = {
+        "thumb": {"width": 150, "height": 150, "format": "webp", "quality": 70},
+        "hero": {"width": 1920, "format": "webp", "quality": 85},
+        "social": {"width": 1200, "height": 630, "format": "jpeg", "quality": 90},
+        "preview": {"width": 400, "format": "png", "quality": 80}
+    }
+    
     # --- ENVIRONMENT CONFIG ---
     model_config = SettingsConfigDict(
         env_prefix="MORPHOSX_",

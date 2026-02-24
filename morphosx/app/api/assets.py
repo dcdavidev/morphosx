@@ -116,35 +116,53 @@ async def get_processed_asset(
     w: Optional[int] = Query(None, alias="width", ge=1, le=settings.max_image_dimension),
     h: Optional[int] = Query(None, alias="height", ge=1, le=settings.max_image_dimension),
     fmt: Optional[ImageFormat] = Query(None, alias="format"),
-    q: int = Query(settings.default_quality, alias="quality", ge=1, le=100),
+    q: Optional[int] = Query(None, alias="quality", ge=1, le=100),
+    preset: Optional[str] = Query(None, alias="preset"),
     t: float = Query(0.0, alias="time", ge=0.0),
     p: int = Query(1, alias="page", ge=1),
     s: str = Query(..., alias="signature", description="HMAC-SHA256 signature"),
 ):
     """
     Retrieve and process an asset.
-    If it's a video, extract a frame. If it's a document, extract a page.
+    Supports Smart Presets for quick transformation aliases.
     """
+    # 0. Apply Preset Logic
+    target_w = w
+    target_h = h
+    target_fmt = fmt
+    target_q = q if q else settings.default_quality
+
+    if preset:
+        if preset not in settings.presets:
+            raise HTTPException(status_code=400, detail=f"Invalid preset: {preset}")
+        
+        config = settings.presets[preset]
+        # Preset values act as defaults, explicit query params override them
+        target_w = w if w else config.get("width")
+        target_h = h if h else config.get("height")
+        target_fmt = fmt if fmt else ImageFormat(config.get("format").upper())
+        target_q = q if q else config.get("quality", settings.default_quality)
+
     # 1. Signature Verification (SECURITY FIRST)
-    fmt_val = fmt if fmt else ImageFormat.WEBP
     is_valid = verify_signature(
         asset_id=asset_id,
-        width=w,
+        width=w, 
         height=h,
-        format=fmt_val.value.lower(),
-        quality=q,
+        format=fmt.value.lower() if fmt else "",
+        quality=q if q else 0,
         signature_to_verify=s,
-        secret_key=settings.secret_key
+        secret_key=settings.secret_key,
+        preset=preset
     )
     
     if not is_valid:
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     options = ProcessingOptions(
-        width=w,
-        height=h,
+        width=target_w,
+        height=target_h,
         format=fmt_val,
-        quality=q
+        quality=target_q
     )
     
     # 2. Define Cache Paths (Include timestamp or page for media derivatives)
