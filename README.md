@@ -30,11 +30,11 @@
 
 ## 🛡️ Advanced Security & Authentication
 
-MorphosX features a multi-layer security model to protect your assets.
+Morphosx features a multi-layer security model to protect your assets.
 
 ### 1. JWT Authentication
 
-The engine supports **Bearer JWT** tokens. If a request includes a valid token in the `Authorization` header, MorphosX identifies the `user_id` from the `sub` claim.
+The engine supports **Bearer JWT** tokens. If a request includes a valid token in the `Authorization` header, Morphosx identifies the `user_id` from the `sub` claim.
 
 ### 2. User-Bound HMAC Signatures
 
