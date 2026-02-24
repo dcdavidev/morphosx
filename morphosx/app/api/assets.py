@@ -71,39 +71,61 @@ BIM_EXTENSIONS = {".ifc"}
 
 
 @router.post("/upload")
-async def upload_asset(file: UploadFile = File(...)):
+async def upload_asset(
+    file: UploadFile = File(...),
+    private: bool = Query(False),
+    current_user: Optional[str] = Depends(get_current_user)
+):
     """
-    Upload a new asset (Image or Video), save to 'originals/' folder.
-    Returns a default signed URL for processing.
+    Upload a new asset.
+    - If 'private=True' and user is logged in: saved to 'users/{user_id}/' (PROTECTED)
+    - Otherwise: saved to 'originals/' (PUBLIC)
     """
     asset_uuid = str(uuid.uuid4())
     ext = guess_extension(file.content_type) or ".bin"
-    asset_id = f"originals/{asset_uuid}{ext}"
+    
+    # Determine destination and prefix
+    if private:
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Authentication required for private uploads")
+        folder_prefix = f"users/{current_user}"
+    else:
+        folder_prefix = "originals"
+        
+    asset_id = f"{folder_prefix}/{asset_uuid}{ext}"
 
     try:
         content = await file.read()
         saved_id = await storage.save_asset(asset_id, content)
         
-        # Clean ID for the response
-        clean_id = Path(saved_id).name
+        # Clean ID for the response (for private assets we keep the user prefix)
+        clean_id = saved_id if private else Path(saved_id).name
         
         # Determine if it's a video to suggest thumbnail params
         is_video = ext.lower() in VIDEO_EXTENSIONS
         
-        # Generate a sample signed URL for default WebP
+        # Generate a sample signed URL
         sample_fmt = ImageFormat.WEBP
         sample_q = settings.default_quality
-        sig = generate_signature(clean_id, None, None, sample_fmt.value.lower(), sample_q, settings.secret_key)
+        sig = generate_signature(
+            asset_id=clean_id, 
+            width=None, 
+            height=None, 
+            format=sample_fmt.value.lower(), 
+            quality=sample_q, 
+            secret_key=settings.secret_key,
+            user_id=current_user if private else None
+        )
         
         url = f"{settings.api_prefix}/assets/{clean_id}?s={sig}"
         if is_video:
-            url += "&t=1" # Default to 1s thumbnail
+            url += "&t=1"
 
         return {
             "asset_id": clean_id,
             "url": url,
-            "is_video": is_video,
-            "original_filename": file.filename,
+            "is_private": private,
+            "owner": current_user if private else "public",
             "mime_type": file.content_type,
             "size": len(content)
         }
