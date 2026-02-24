@@ -12,6 +12,7 @@ from morphosx.app.engine.document import DocumentProcessor
 from morphosx.app.engine.raw import RawProcessor
 from morphosx.app.engine.vips import VipsProcessor
 from morphosx.app.engine.text import TextProcessor
+from morphosx.app.engine.office import OfficeProcessor
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.storage.s3 import S3Storage
 from morphosx.app.settings import settings
@@ -45,12 +46,14 @@ audio_processor = AudioProcessor()
 document_processor = DocumentProcessor()
 raw_processor = RawProcessor()
 text_processor = TextProcessor()
+office_processor = OfficeProcessor()
 
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
 DOCUMENT_EXTENSIONS = {".pdf"}
 RAW_EXTENSIONS = {".cr2", ".nef", ".dng", ".arw"}
 TEXT_EXTENSIONS = {".json", ".xml", ".md"}
+OFFICE_EXTENSIONS = {".docx", ".pptx", ".xlsx"}
 
 
 
@@ -168,6 +171,7 @@ async def get_processed_asset(
         is_audio = Path(asset_id).suffix.lower() in AUDIO_EXTENSIONS
         is_raw = Path(asset_id).suffix.lower() in RAW_EXTENSIONS
         is_text = Path(asset_id).suffix.lower() in TEXT_EXTENSIONS
+        is_office = Path(asset_id).suffix.lower() in OFFICE_EXTENSIONS
 
         if is_video:
             # Video: Extract Frame -> Process as Image
@@ -190,6 +194,10 @@ async def get_processed_asset(
             # Text: Render to Image -> Process as Image
             rendered_bytes = text_processor.render_to_image(source_bytes, asset_id, options)
             processed_data, mime_type = processor.process(rendered_bytes, options)
+        elif is_office:
+            # Office: Generate Summary Card -> Process as Image
+            office_card_bytes = office_processor.render_thumbnail(source_bytes, asset_id)
+            processed_data, mime_type = processor.process(office_card_bytes, options)
         else:
             # Image: Process directly
             processed_data, mime_type = processor.process(source_bytes, options)
