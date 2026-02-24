@@ -1,0 +1,33 @@
+[project]
+name = "morphosx"
+version = "0.1.0"
+description = "high-performance oss cloud storage. self-host your assets with lightning-fast on-the-fly image processing and delivery."
+authors = [
+    {name = "Davide Di Criscito"}
+]
+requires-python = "^3.11"
+dependencies = [
+    "fastapi (>=0.132.0,<0.133.0)",
+    "uvicorn (>=0.41.0,<0.42.0)",
+    "pillow (>=12.1.1,<13.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "black (>=26.1.0,<27.0.0)",
+    "isort (>=8.0.0,<9.0.0)"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88

@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Poetry
+# Note: we DO commit poetry.lock, but not the virtualenv
+.python-version
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Project specific
+.env
+*.log
+data/
+uploads/
