@@ -21,7 +21,9 @@ dependencies = [
     "aioboto3 (>=15.5.0,<16.0.0)",
     "pyvips (>=3.1.1,<4.0.0)",
     "pygments (>=2.19.2,<3.0.0)",
-    "markdown (>=3.10.2,<4.0.0)"
+    "markdown (>=3.10.2,<4.0.0)",
+    "pillow-heif (>=1.2.1,<2.0.0)",
+    "pillow-avif-plugin (>=1.5.5,<2.0.0)"
 ]
 
 [project.scripts]

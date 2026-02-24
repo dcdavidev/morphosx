@@ -4,6 +4,16 @@ from enum import Enum
 from typing import Optional, Tuple
 
 from PIL import Image
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+except ImportError:
+    pass
+
+try:
+    import pillow_avif
+except ImportError:
+    pass
 
 
 class ImageFormat(str, Enum):
