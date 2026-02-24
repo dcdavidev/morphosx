@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="morphosx-banner.png" alt="morphosx banner" width="600px">
+</p>
+
 # morphosx 🧬
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
