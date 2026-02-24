@@ -6,107 +6,107 @@
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
 
-`morphosx` è un server di elaborazione media ad alte prestazioni progettato per convertire quasi ogni tipo di file in derivati immagine ottimizzati per il web in tempo reale. Gestisce la memorizzazione, la sicurezza tramite firma HMAC e la distribuzione efficiente di asset multimediali.
+`morphosx` is a high-performance media processing server designed to convert almost any file type into web-optimized image derivatives in real-time. It handles storage, security via HMAC signatures, and efficient distribution of multimedia assets.
 
 ---
 
-## ⚡ Caratteristiche Principali
+## ⚡ Core Features
 
-### 🖼️ Motore di Immagini Universale
-- **Trasformazioni Live**: Ridimensionamento, cambio formato e compressione in memoria.
-- **Formati Moderni**: Supporto nativo per **HEIC/HEIF** (iPhone) e **AVIF** (Next-gen).
-- **RAW Development**: Sviluppo professionale di file grezzi fotografici (**CR2, NEF, DNG, ARW**) con bilanciamento del bianco della fotocamera.
-- **Rendering Vettoriale**: Generazione di anteprime raster da file **SVG**.
+### 🖼️ Universal Image Engine
+- **Live Transformations**: Resizing, format switching, and in-memory compression.
+- **Modern Formats**: Native support for **HEIC/HEIF** (iPhone) and **AVIF** (Next-gen).
+- **RAW Development**: Professional processing of photographic raw files (**CR2, NEF, DNG, ARW**) with camera white balance support.
+- **Vector Rendering**: Raster preview generation from **SVG** files.
 
-### 🎬 Media & Documenti
-- **Video Thumbnails**: Estrazione di frame ad alta precisione da **MP4, WEBM, MOV, AVI** specificando il parametro `time`.
-- **Audio Waveforms**: Generazione visiva della forma d'onda per **MP3, WAV, OGG, FLAC**.
-- **PDF Rendering**: Conversione di pagine specifiche in immagini nitide (parametro `page`).
-- **Office Cards**: Generazione di schede riassuntive per **DOCX, PPTX, XLSX** con estrazione dei testi principali.
+### 🎬 Media & Documents
+- **Video Thumbnails**: High-precision frame extraction from **MP4, WEBM, MOV, AVI** using the `time` parameter.
+- **Audio Waveforms**: Visual waveform generation for **MP3, WAV, OGG, FLAC**.
+- **PDF Rendering**: Conversion of specific pages into sharp images (using the `page` parameter).
+- **Office Cards**: Summary card generation for **DOCX, PPTX, XLSX** with key text extraction.
 
-### 🏗️ Ingegneria & Design
-- **BIM Technical Cards**: Estrazione metadati architettonici (muri, piani, finestre) da file **IFC**.
-- **3D Blueprints**: Schede tecniche con bounding box e metadati per **STL, OBJ, GLB, GLTF**.
-- **Font Specimen**: Generazione di campionari tipografici completi da file **TTF** e **OTF**.
-- **Archive Explorer**: Visualizzazione del contenuto di archivi **ZIP** e **TAR** in formato "folder preview".
+### 🏗️ Engineering & Design
+- **BIM Technical Cards**: Architectural metadata extraction (walls, floors, windows) from **IFC** files.
+- **3D Blueprints**: Technical sheets with bounding boxes and metadata for **STL, OBJ, GLB, GLTF**.
+- **Font Specimen**: Generation of complete typographic specimens from **TTF** and **OTF** files.
+- **Archive Explorer**: Content visualization for **ZIP** and **TAR** archives in a "folder preview" format.
 
-### 🚀 Performance & Architettura
-- **Dual Engine**: Scegli tra **Pillow** (stabilità) o **PyVips** (velocità estrema per grandi file) tramite `MORPHOSX_ENGINE_TYPE`.
-- **Storage Modulare**: Supporto per **Local Filesystem** e **Amazon S3** (o compatibili come MinIO/DigitalOcean).
-- **Zero-Disk I/O**: Pipeline di elaborazione interamente in RAM tramite buffer `BytesIO`.
-- **Intelligent Caching**: I derivati vengono calcolati una volta e serviti istantaneamente dalle richieste successive.
+### 🚀 Performance & Architecture
+- **Dual Engine**: Choose between **Pillow** (stability) or **PyVips** (extreme speed for large files) via `MORPHOSX_ENGINE_TYPE`.
+- **Modular Storage**: Support for **Local Filesystem** and **Amazon S3** (or S3-compatible providers like MinIO/DigitalOcean).
+- **Zero-Disk I/O**: Entire processing pipeline runs in RAM using `BytesIO` buffers.
+- **Intelligent Caching**: Derivatives are computed once and served instantly for subsequent requests.
 
 ---
 
-## 🛡️ Sicurezza: HMAC-SHA256
-MorphosX protegge le tue risorse impedendo la generazione non autorizzata di varianti (che potrebbe causare attacchi DoS). Ogni URL deve essere firmato con un HMAC che include:
+## 🛡️ Security: HMAC-SHA256
+MorphosX protects your resources by preventing unauthorized variant generation (protecting against DoS attacks). Every URL must be signed with an HMAC that includes:
 `asset_id | width | height | format | quality | preset`
 
 ---
 
 ## ✨ Smart Presets
-Invece di inviare parametri complessi, puoi usare alias predefiniti in `settings.py`:
-- `preset=thumb`: 150x150 WebP (Ottimo per avatar/anteprime).
-- `preset=hero`: 1920px WebP (Ottimo per banner).
-- `preset=social`: 1200x630 JPEG (Ottimo per OpenGraph/Social share).
+Instead of sending complex parameters, you can use predefined aliases in `settings.py`:
+- `preset=thumb`: 150x150 WebP (Ideal for avatars/thumbnails).
+- `preset=hero`: 1920px WebP (Ideal for banners).
+- `preset=social`: 1200x630 JPEG (Ideal for OpenGraph/Social sharing).
 
 ---
 
-## 🚀 Guida Rapida
+## 🚀 Quick Start
 
-### 1. Prerequisiti
+### 1. Prerequisites
 - **Python 3.11 - 3.14**
-- **FFmpeg** (per video e audio)
-- **libvips** (opzionale, per prestazioni ultra-elevate)
+- **FFmpeg** (for video and audio)
+- **libvips** (optional, for ultra-high performance)
 
-### 2. Installazione
+### 2. Installation
 ```bash
 git clone https://github.com/dcdavidev/morphosx.git
 cd morphosx
 poetry install
 ```
 
-### 3. Configurazione (.env)
+### 3. Configuration (.env)
 ```bash
-MORPHOSX_SECRET_KEY="il-tuo-segreto-cyber"
-MORPHOSX_STORAGE_TYPE="local" # o "s3"
-MORPHOSX_ENGINE_TYPE="pillow" # o "vips"
+MORPHOSX_SECRET_KEY="your-cyber-secret"
+MORPHOSX_STORAGE_TYPE="local" # or "s3"
+MORPHOSX_ENGINE_TYPE="pillow" # or "vips"
 ```
 
-### 4. Avvio
+### 4. Start
 ```bash
 poetry run start
 ```
 
 ---
 
-## 🧪 Tabella dei Media Supportati
+## 🧪 Supported Media Table
 
-| Categoria | Estensioni | Tipo di Output |
+| Category | Extensions | Output Type |
 | :--- | :--- | :--- |
-| **Immagini** | jpg, png, webp, heic, avif | Immagine Processata |
+| **Images** | jpg, png, webp, heic, avif | Processed Image |
 | **Video** | mp4, mov, webm, avi | Frame @ timestamp |
 | **Audio** | mp3, wav, ogg, flac | Waveform Image |
-| **Documenti** | pdf, docx, pptx, xlsx | Render Pagina / Summary |
+| **Documents** | pdf, docx, pptx, xlsx | Page Render / Summary |
 | **BIM** | ifc | Technical Project Card |
 | **3D / CAD** | stl, obj, glb, gltf | Technical Blueprint |
-| **Testo / Codice**| json, xml, md, txt | Syntax-highlighted Image |
-| **Tipografia** | ttf, otf | Font Specimen Image |
-| **Archivi** | zip, tar | Content List Image |
+| **Text / Code**| json, xml, md, txt | Syntax-highlighted Image |
+| **Typography** | ttf, otf | Font Specimen Image |
+| **Archives** | zip, tar | Content List Image |
 
 ---
 
-## 📁 Struttura del Progetto
+## 📁 Project Structure
 ```text
 morphosx/
 ├── app/
-│   ├── api/        # Endpoint FastAPI
-│   ├── core/       # Sicurezza & Firma HMAC
-│   ├── engine/     # Motori specializzati (Video, 3D, BIM, ecc.)
-│   ├── storage/    # Adapter Local e S3
-│   └── settings.py # Configurazione centralizzata
-└── data/           # Asset originali e Cache dei derivati
+│   ├── api/        # FastAPI Endpoints
+│   ├── core/       # Security & HMAC Signing
+│   ├── engine/     # Specialized Engines (Video, 3D, BIM, etc.)
+│   ├── storage/    # Local and S3 Adapters
+│   └── settings.py # Centralized Configuration
+└── data/           # Original assets and Derivative Cache
 ```
 
-## 📜 Licenza
-MIT - Creato per la comunità Open Source.
+## 📜 License
+MIT - Built for the Open Source community.
