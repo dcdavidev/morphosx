@@ -1,0 +1,21 @@
+## v0.2.0 (2026-02-24)
+
+### Feat
+
+- complete folder navigation and listing API with security checks
+- enhance upload logic to support private and public asset distinction
+- add user-bound security, private folders, and JWT authentication
+- implement Smart Presets system for transformation aliases
+- add support for BIM (IFC) and GLTF media types
+- add support for archive content previews (ZIP, TAR)
+- add support for 3D model technical previews (STL, OBJ, GLB)
+- add support for font specimen generation (TTF, OTF)
+- add support for Office documents (DOCX, PPTX, XLSX) summary cards
+- add support for HEIC, HEIF, and AVIF modern image formats
+- add support for Markdown, JSON and XML rendering
+- implement S3 storage and PyVips image processor
+- implement RAW image processing support with rawpy
+- implement PDF document to image extraction
+- implement audio waveform generation
+- implement video processing and thumbnail extraction with FFmpeg
+- implement morphosx core engine, storage, and security layers
