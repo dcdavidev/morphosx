@@ -311,8 +311,8 @@ async def get_processed_asset(
         
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Asset not found")
-            except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
     
     
     @router.get("/list/{path:path}")
