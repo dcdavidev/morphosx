@@ -31,15 +31,13 @@ class OfficeProcessor:
                 doc = Document(io.BytesIO(doc_data))
                 title = "Word Document"
                 # Extract first 5 paragraphs
-                summary = "
-".join([p.text for p in doc.paragraphs[:5] if p.text.strip()])
+                summary = "\n".join([p.text for p in doc.paragraphs[:5] if p.text.strip()])
             elif ext == "pptx":
                 prs = Presentation(io.BytesIO(doc_data))
                 title = f"PowerPoint ({len(prs.slides)} slides)"
                 if len(prs.slides) > 0:
                     slide = prs.slides[0]
-                    summary = "
-".join([shape.text for shape in slide.shapes if hasattr(shape, "text")])
+                    summary = "\n".join([shape.text for shape in slide.shapes if hasattr(shape, "text")])
             elif ext == "xlsx":
                 wb = load_workbook(io.BytesIO(doc_data), data_only=True)
                 ws = wb.active
@@ -48,8 +46,7 @@ class OfficeProcessor:
                 rows = []
                 for row in ws.iter_rows(max_row=10, max_col=5):
                     rows.append(" | ".join([str(cell.value or "") for cell in row]))
-                summary = "
-".join(rows)
+                summary = "\n".join(rows)
 
             return self._create_summary_card(title, summary[:500])
             

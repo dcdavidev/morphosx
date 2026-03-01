@@ -27,7 +27,7 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock README.md ./
 
 # Install dependencies
-RUN poetry install --no-root --no-interaction --no-ansi
+RUN poetry install --all-extras --no-root --no-interaction --no-ansi
 
 
 # --- STAGE 2: Runtime ---

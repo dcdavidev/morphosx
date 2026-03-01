@@ -43,20 +43,12 @@ class BIMProcessor:
                 
                 title = f"BIM Project: {project.Name if project else 'Unnamed'}"
                 summary = (
-                    f"Site: {site.Name if site else 'Unknown'}
-"
-                    f"Building Stories: {stories}
-
-"
-                    f"Element Count:
-"
-                    f"- Walls: {walls}
-"
-                    f"- Windows: {windows}
-"
-                    f"- Doors: {doors}
-
-"
+                    f"Site: {site.Name if site else 'Unknown'}\n"
+                    f"Building Stories: {stories}\n\n"
+                    f"Element Count:\n"
+                    f"- Walls: {walls}\n"
+                    f"- Windows: {windows}\n"
+                    f"- Doors: {doors}\n\n"
                     f"Schema: {model.schema}"
                 )
             finally:

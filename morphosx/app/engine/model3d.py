@@ -35,20 +35,12 @@ class Model3DProcessor:
             size = bounds[1] - bounds[0]
             
             summary = (
-                f"Vertices: {vertices}
-"
-                f"Faces/Nodes: {faces}
-
-"
-                f"Bounding Box Dimensions:
-"
-                f"X: {size[0]:.2f}
-"
-                f"Y: {size[1]:.2f}
-"
-                f"Z: {size[2]:.2f}
-
-"
+                f"Vertices: {vertices}\n"
+                f"Faces/Nodes: {faces}\n\n"
+                f"Bounding Box Dimensions:\n"
+                f"X: {size[0]:.2f}\n"
+                f"Y: {size[1]:.2f}\n"
+                f"Z: {size[2]:.2f}\n\n"
                 f"Volume: {getattr(mesh, 'volume', 0):.2f}"
             )
 

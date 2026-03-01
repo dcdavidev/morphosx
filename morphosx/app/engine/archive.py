@@ -25,11 +25,9 @@ class ArchiveProcessor:
                     file_list = [f.name for f in t.getmembers()[:15]]
                     total = len(t.getmembers())
             
-            summary = "
-".join(file_list)
+            summary = "\n".join(file_list)
             if total > 15:
-                summary += f"
-... and {total - 15} more files."
+                summary += f"\n... and {total - 15} more files."
             
             title = f"Archive: {filename} ({total} files)"
             return self._create_folder_card(title, summary)
