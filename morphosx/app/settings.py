@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,15 +16,16 @@ class Settings(BaseSettings):
     app_name: str = "morphosx"
     debug: bool = False
     api_prefix: str = "/v1"
+    port: int = 6100
     
     # --- SECURITY ---
     # MUST be changed in production!
     secret_key: str = "change-me-at-all-costs-cyberpunk-2077"
     
     # --- STORAGE PATHS ---
-    # Defaults to 'data/' in the project root
+    # Defaults to 'storage/' in the project root
     base_dir: Path = Path(__file__).resolve().parent.parent.parent
-    storage_root: str = str(base_dir / "data")
+    storage_path: str = str(base_dir / "storage")
     
     # --- STORAGE BACKEND ---
     # Choice: 'local' or 's3'
@@ -37,15 +38,15 @@ class Settings(BaseSettings):
     
     @property
     def originals_dir(self) -> str:
-        return str(Path(self.storage_root) / "originals")
+        return str(Path(self.storage_path) / "originals")
     
     @property
     def cache_dir(self) -> str:
-        return str(Path(self.storage_root) / "cache")
+        return str(Path(self.storage_path) / "cache")
     
     # --- IMAGE & MEDIA ENGINE ---
     # Choice: 'pillow' or 'vips'
-    engine_type: str = "pillow"
+    engine_type: str = "vips"
     default_quality: int = 80
     max_image_dimension: int = 4096
     allowed_formats: List[str] = ["jpeg", "png", "webp", "mp4", "webm", "mov", "mp3", "wav", "ogg", "flac", "pdf", "cr2", "nef", "dng", "arw", "json", "xml", "md", "heic", "heif", "avif", "docx", "pptx", "xlsx", "ttf", "otf", "stl", "obj", "glb", "zip", "tar", "ifc", "gltf"]

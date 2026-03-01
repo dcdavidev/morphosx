@@ -51,14 +51,16 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY . .
 
 # Create storage directories
-RUN mkdir -p data/originals data/cache data/users
+RUN mkdir -p storage/originals storage/cache storage/users
 
-# Expose FastAPI default port
-EXPOSE 8000
+# Expose FastAPI custom port
+EXPOSE 6100
 
 # Set environment defaults
-ENV MORPHOSX_STORAGE_TYPE="local" \
-    MORPHOSX_ENGINE_TYPE="pillow"
+ENV MORPHOSX_PORT=6100 \
+    MORPHOSX_STORAGE_TYPE="local" \
+    MORPHOSX_ENGINE_TYPE="vips" \
+    MORPHOSX_STORAGE_PATH="/app/storage"
 
-# Run the application
-CMD ["uvicorn", "morphosx.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application using the custom port
+CMD ["sh", "-c", "uvicorn morphosx.app.main:app --host 0.0.0.0 --port ${MORPHOSX_PORT}"]

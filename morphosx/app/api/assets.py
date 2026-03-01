@@ -37,7 +37,7 @@ def get_storage():
             access_key_id=settings.s3_access_key,
             secret_access_key=settings.s3_secret_key
         )
-    return LocalStorage(base_directory=settings.storage_root)
+    return LocalStorage(base_directory=settings.storage_path)
 
 def get_processor():
     if settings.engine_type == "vips":

@@ -28,7 +28,7 @@
 The easiest way to run Morphosx with all features and system dependencies pre-installed.
 
 ```bash
-docker run -p 8000:8000 --env-file .env ghcr.io/dcdavidev/morphosx:latest
+docker run -p 6100:6100 --env-file .env ghcr.io/dcdavidev/morphosx:latest
 ```
 
 ### 2. Using pip (from PyPI)
@@ -57,7 +57,7 @@ pip install "morphosx[video,pdf,3d]"
 If installed via pip, you can use the global command:
 
 ```bash
-morphosx start --port 8000 --reload
+morphosx start --port 6100 --reload
 ```
 
 ### 1. Uploading Assets
@@ -65,13 +65,13 @@ morphosx start --port 8000 --reload
 **Public Upload**
 
 ```bash
-curl -X POST "http://localhost:8000/v1/assets/upload?folder=news" -F "file=@img.jpg"
+curl -X POST "http://localhost:6100/v1/assets/upload?folder=news" -F "file=@img.jpg"
 ```
 
 **Private Upload**
 
 ```bash
-curl -X POST "http://localhost:8000/v1/assets/upload?private=true" \
+curl -X POST "http://localhost:6100/v1/assets/upload?private=true" \
      -H "Authorization: Bearer <TOKEN>" -F "file=@secret.pdf"
 ```
 
