@@ -53,7 +53,7 @@ COPY . .
 # Create storage directories
 RUN mkdir -p storage/originals storage/cache storage/users
 
-# Expose FastAPI custom port
+# Expose FastAPI custom portgit
 EXPOSE 6100
 
 # Set environment defaults
