@@ -1,3 +1,9 @@
+## v0.5.1 (2026-03-01)
+
+### Fix
+
+- resolve IndentationError in assets.py
+
 ## v0.5.0 (2026-03-01)
 
 ### Feat
