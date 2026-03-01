@@ -1,3 +1,9 @@
+## v0.5.3 (2026-03-01)
+
+### Fix
+
+- resolve NameError in get_processed_asset by using target_fmt
+
 ## v0.5.2 (2026-03-01)
 
 ### Fix
