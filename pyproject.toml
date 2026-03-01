@@ -1,6 +1,6 @@
 [project]
 name = "morphosx"
-version = "0.5.1"
+version = "0.5.2"
 description = "high-performance media processing engine for on-the-fly image transformations and storage."
 authors = [
     {name = "Davide Di Criscito"}
@@ -75,7 +75,7 @@ line_length = 88
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.5.1"
+version = "0.5.2"
 version_files = [
     "pyproject.toml:version"
 ]

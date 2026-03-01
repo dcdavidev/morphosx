@@ -1,3 +1,9 @@
+## v0.5.2 (2026-03-01)
+
+### Fix
+
+- add missing dependencies and resolve syntax errors in processors
+
 ## v0.5.1 (2026-03-01)
 
 ### Fix
