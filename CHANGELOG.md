@@ -1,3 +1,13 @@
+## v0.5.0 (2026-03-01)
+
+### Feat
+
+- support custom port 6100, unify storage paths, and set vips as default engine
+
+### Fix
+
+- change port to 6100, change env vars
+
 ## v0.4.0 (2026-02-24)
 
 ### Feat
