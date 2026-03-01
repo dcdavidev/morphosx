@@ -203,10 +203,14 @@ async def get_processed_asset(
     if not is_valid:
         raise HTTPException(status_code=403, detail="Invalid signature")
 
+    # Ensure we have a valid format before processing
+    if not target_fmt:
+        target_fmt = ImageFormat.WEBP
+
     options = ProcessingOptions(
         width=target_w,
         height=target_h,
-        format=fmt_val,
+        format=target_fmt,
         quality=target_q
     )
     
