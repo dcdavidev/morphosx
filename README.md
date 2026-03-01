@@ -7,7 +7,7 @@
 > **High performance, low footprint.**  
 > Self-hosted, open-source media engine for on-the-fly image processing and delivery.
 
-`morphosx` is a high-speed, minimal cloud storage and media manipulation server. It converts almost any media type into a optimized, web-ready image derivative on-the-fly.
+`morphosx` is a high-speed, minimal cloud storage and media manipulation server. It converts almost any media type into an optimized, web-ready image derivative on-the-fly.
 
 ---
 
@@ -15,9 +15,10 @@
 
 - **User-Bound Security**: Protected assets and HMAC signatures tied to specific **JWT-authenticated** users.
 - **Private Folders**: Secure per-user storage using the `users/{user_id}/` path convention.
-- **Universal Rendering**: Support for BIM (IFC), 3D (STL/OBJ/GLB), Office, Font Specimen, Archives, Video, Audio and RAW.
+- **Universal Rendering**: Support for BIM (IFC), 3D (STL/OBJ/GLB), Office, Font Specimen, Archives, Video, Audio, and RAW.
 - **Modern Engines**: Choice between **Pillow** and **PyVips** (ultra-fast).
 - **Cloud Ready**: Pluggable storage system (Local & **Amazon S3**).
+- **Smart Caching**: Automatic derivative caching for optimized delivery.
 
 ---
 
@@ -50,52 +51,57 @@ pip install "morphosx[video,pdf,3d]"
 
 ---
 
-## 📖 Usage Guide
+## 📖 Documentation
 
-### Start the Server
+For detailed guides, check out the `docs/` folder:
 
-If installed via pip, you can use the global command:
+- [**Introduction**](docs/introduction.md): Overview, architecture, and quick start.
+- [**Upload Guide**](docs/upload.md): Managing public and private asset uploads.
+- [**Processing & Presets**](docs/processing.md): On-the-fly transformations and smart presets.
+- [**Security & Signatures**](docs/security.md): HMAC validation and asset protection.
+- [**Configuration**](docs/configuration.md): Environment variables and server settings.
 
-```bash
-morphosx start --port 6100 --reload
-```
+---
+
+## 🛠️ Usage Guide
 
 ### 1. Uploading Assets
 
 **Public Upload**
-
 ```bash
 curl -X POST "http://localhost:6100/v1/assets/upload?folder=news" -F "file=@img.jpg"
 ```
 
 **Private Upload**
-
 ```bash
 curl -X POST "http://localhost:6100/v1/assets/upload?private=true" \
      -H "Authorization: Bearer <TOKEN>" -F "file=@secret.pdf"
 ```
 
-### 2. Listing Files
+### 2. Retrieving & Processing
+
+All GET requests must be signed using HMAC-SHA256.
 
 ```text
-GET /v1/assets/list/originals/news
+GET /v1/assets/my-image.jpg?width=300&format=webp&signature=HASH
 ```
 
 ---
 
 ## ✨ Smart Presets
 
-Use predefined aliases in `settings.py` for cleaner URLs:
+Use predefined aliases for cleaner URLs:
 
 - `preset=thumb`: 150x150 WebP.
 - `preset=hero`: 1920px WebP.
 - `preset=social`: 1200x630 JPEG.
+- `preset=preview`: 400px PNG.
 
 ---
 
 ## 🛡️ Advanced Security
 
-Morphosx uses **HMAC-SHA256** to prevent DoS attacks.
+Morphosx uses **HMAC-SHA256** to prevent DoS attacks and unauthorized manipulation.
 The signature payload includes: `asset_id | width | height | format | quality | preset | user_id`.
 
 ---
@@ -122,3 +128,4 @@ The signature payload includes: `asset_id | width | height | format | quality | 
 ## 📜 License
 
 MIT - Built for the Open Source community.
+
