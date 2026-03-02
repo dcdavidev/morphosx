@@ -1,3 +1,9 @@
+## v0.6.0 (2026-03-02)
+
+### Feat
+
+- **api**: add support for JSON, YAML and XML metadata for BIM and 3D models
+
 ## v0.5.3 (2026-03-01)
 
 ### Fix
