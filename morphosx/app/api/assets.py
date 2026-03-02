@@ -1,7 +1,10 @@
+import json
+import yaml
+import xml.etree.ElementTree as ET
 from pathlib import Path
 import uuid
 from mimetypes import guess_extension
-from typing import Optional
+from typing import Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFile, File
 
 from morphosx.app.core.security import verify_signature, generate_signature
@@ -141,6 +144,16 @@ async def upload_asset(
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
+def get_mime_type(fmt: ImageFormat) -> str:
+    if fmt == ImageFormat.JSON:
+        return "application/json"
+    elif fmt == ImageFormat.YAML:
+        return "application/x-yaml"
+    elif fmt == ImageFormat.XML:
+        return "application/xml"
+    return f"image/{fmt.value.lower()}"
+
+
 @router.get("/{asset_id:path}")
 async def get_processed_asset(
     asset_id: str,
@@ -232,7 +245,7 @@ async def get_processed_asset(
             derivative_bytes = await storage.get_asset(derivative_id)
             return Response(
                 content=derivative_bytes,
-                media_type=f"image/{options.format.value.lower()}",
+                media_type=get_mime_type(options.format),
                 headers={
                     "Cache-Control": "public, max-age=31536000, immutable",
                     "X-MorphosX-Cache": "HIT"
@@ -256,7 +269,42 @@ async def get_processed_asset(
         is_archive = Path(asset_id).suffix.lower() in ARCHIVE_EXTENSIONS
         is_bim = Path(asset_id).suffix.lower() in BIM_EXTENSIONS
 
-        if is_video:
+        # Check if we want metadata (JSON, YAML, XML) instead of an image
+        if options.format in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
+            metadata = {}
+            if is_bim:
+                metadata = bim_processor.get_metadata(source_bytes)
+            elif is_model3d:
+                metadata = model3d_processor.get_metadata(source_bytes, asset_id)
+            else:
+                # Fallback for other types: basic file info
+                metadata = {
+                    "asset_id": asset_id,
+                    "size": len(source_bytes),
+                    "extension": Path(asset_id).suffix.lower()
+                }
+
+            if options.format == ImageFormat.JSON:
+                processed_data = json.dumps(metadata, indent=2).encode("utf-8")
+                mime_type = "application/json"
+            elif options.format == ImageFormat.YAML:
+                processed_data = yaml.dump(metadata, sort_keys=False).encode("utf-8")
+                mime_type = "application/x-yaml"
+            elif options.format == ImageFormat.XML:
+                # Simple dict to XML conversion
+                root = ET.Element("metadata")
+                def build_xml(parent, data):
+                    if isinstance(data, dict):
+                        for k, v in data.items():
+                            child = ET.SubElement(parent, k)
+                            build_xml(child, v)
+                    else:
+                        parent.text = str(data)
+                build_xml(root, metadata)
+                processed_data = ET.tostring(root, encoding="utf-8")
+                mime_type = "application/xml"
+        
+        elif is_video:
             # Video: Extract Frame -> Process as Image
             frame_bytes = video_processor.extract_thumbnail(source_bytes, t)
             processed_data, mime_type = processor.process(frame_bytes, options)

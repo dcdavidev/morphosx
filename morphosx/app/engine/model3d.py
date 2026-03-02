@@ -5,14 +5,14 @@ from PIL import Image, ImageDraw
 
 class Model3DProcessor:
     """
-    Engine for generating 2D previews for 3D Models (STL, OBJ, GLB).
+    Engine for generating 2D previews and metadata for 3D Models (STL, OBJ, GLB).
     
     Generates a 'Blueprint' card with model metadata and a bounding box summary.
     """
 
-    def render_thumbnail(self, model_data: bytes, filename: str) -> bytes:
+    def get_metadata(self, model_data: bytes, filename: str) -> dict:
         """
-        Create a preview of the 3D model.
+        Extract structural metadata from a 3D model.
         """
         ext = filename.split(".")[-1].lower()
         try:
@@ -25,29 +25,52 @@ class Model3DProcessor:
                 # It's a scene (common for GLB)
                 vertices = mesh.vertices.shape[0]
                 faces = len(mesh.graph.nodes) # approximation
-                title = f"3D Scene ({ext.upper()})"
+                is_scene = True
             else:
                 vertices = mesh.vertices.shape[0]
                 faces = mesh.faces.shape[0]
-                title = f"3D Model ({ext.upper()})"
+                is_scene = False
 
             bounds = mesh.bounds
             size = bounds[1] - bounds[0]
             
-            summary = (
-                f"Vertices: {vertices}\n"
-                f"Faces/Nodes: {faces}\n\n"
-                f"Bounding Box Dimensions:\n"
-                f"X: {size[0]:.2f}\n"
-                f"Y: {size[1]:.2f}\n"
-                f"Z: {size[2]:.2f}\n\n"
-                f"Volume: {getattr(mesh, 'volume', 0):.2f}"
-            )
-
-            return self._create_blueprint_card(title, summary)
-            
+            return {
+                "type": "3D_Model",
+                "format": ext.upper(),
+                "is_scene": is_scene,
+                "vertices": vertices,
+                "faces_or_nodes": faces,
+                "bounding_box": {
+                    "x": float(size[0]),
+                    "y": float(size[1]),
+                    "z": float(size[2])
+                },
+                "volume": float(getattr(mesh, 'volume', 0))
+            }
         except Exception as e:
-            return self._create_blueprint_card("3D Model Error", f"Could not parse 3D file: {str(e)}")
+            return {"error": f"Could not parse 3D file: {str(e)}"}
+
+    def render_thumbnail(self, model_data: bytes, filename: str) -> bytes:
+        """
+        Create a preview of the 3D model.
+        """
+        metadata = self.get_metadata(model_data, filename)
+        
+        if "error" in metadata:
+            return self._create_blueprint_card("3D Model Error", metadata["error"])
+
+        title = f"{'3D Scene' if metadata['is_scene'] else '3D Model'} ({metadata['format']})"
+        summary = (
+            f"Vertices: {metadata['vertices']}\n"
+            f"Faces/Nodes: {metadata['faces_or_nodes']}\n\n"
+            f"Bounding Box Dimensions:\n"
+            f"X: {metadata['bounding_box']['x']:.2f}\n"
+            f"Y: {metadata['bounding_box']['y']:.2f}\n"
+            f"Z: {metadata['bounding_box']['z']:.2f}\n\n"
+            f"Volume: {metadata['volume']:.2f}"
+        )
+
+        return self._create_blueprint_card(title, summary)
 
     def _create_blueprint_card(self, title: str, text: str) -> bytes:
         """Render a technical blueprint-style card."""

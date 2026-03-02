@@ -17,10 +17,13 @@ except ImportError:
 
 
 class ImageFormat(str, Enum):
-    """Supported output image formats."""
+    """Supported output formats."""
     JPEG = "JPEG"
     PNG = "PNG"
     WEBP = "WEBP"
+    JSON = "JSON"
+    YAML = "YAML"
+    XML = "XML"
 
 
 @dataclass(frozen=True)
