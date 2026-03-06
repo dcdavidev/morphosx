@@ -1,3 +1,9 @@
+## v0.7.0 (2026-03-06)
+
+### Feat
+
+- add root health check and sync version with pyproject.toml
+
 ## v0.6.0 (2026-03-02)
 
 ### Feat
