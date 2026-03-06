@@ -42,4 +42,8 @@ jobs:
 
       - name: Push changes and tags
         run: |
-          git push origin main --tags
+          if [ $(git tag --points-at HEAD | wc -l) -gt 0 ]; then
+            git push origin main --tags
+          else
+            echo "No new tag created, skipping push."
+          fi
