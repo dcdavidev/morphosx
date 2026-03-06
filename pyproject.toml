@@ -86,7 +86,7 @@ version_files = [
 bump_message = "bump: version $current_version → $new_version [skip ci]"
 
 [tool.poe.tasks]
-release = { cmd = "cz bump --changelog || true" }
+release = "cz bump --changelog"
 commit = "cz commit"
 check = "pytest tests/"
 clean = "rm -rf storage/cache/*"

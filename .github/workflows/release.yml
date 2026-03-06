@@ -38,7 +38,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run Release
-        run: poetry run poe release
+        run: poetry run poe release || true
 
       - name: Push changes and tags
         run: |
