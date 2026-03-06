@@ -1,3 +1,9 @@
+## v0.8.0 (2026-03-06)
+
+### Feat
+
+- allow ci and chore commits to trigger version bump
+
 ## v0.7.0 (2026-03-06)
 
 ### Feat
