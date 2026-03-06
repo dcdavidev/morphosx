@@ -88,7 +88,7 @@ bump_pattern = "^(feat|fix|refactor|perf|ci|chore)"
 change_type_map = {"feat" = "Feat", "fix" = "Fix", "refactor" = "Refactor", "perf" = "Perf", "ci" = "CI", "chore" = "Chore"}
 
 [tool.poe.tasks]
-release = "cz bump --changelog --check-consistency"
+release = "cz bump --changelog --check-consistency --yes"
 commit = "cz commit"
 check = "pytest tests/"
 clean = "rm -rf storage/cache/*"
