@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from morphosx.app import __version__
 from morphosx.app.api.assets import router as assets_router
 from morphosx.app.settings import settings
 
@@ -11,11 +12,16 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         description="High-performance OSS cloud storage for on-the-fly image processing.",
-        version="0.1.0"
+        version=__version__
     )
 
     # Register API routes
     app.include_router(assets_router, prefix=settings.api_prefix)
+
+    @app.get("/", tags=["Health"])
+    async def root_health_check():
+        """Root health check endpoint."""
+        return {"status": "ok", "app": settings.app_name, "version": __version__}
 
     @app.get("/health", tags=["Health"])
     async def health_check():
