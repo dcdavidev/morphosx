@@ -30,7 +30,9 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Install dependencies
-        run: poetry install
+        run: |
+          poetry lock --no-update
+          poetry install
 
       - name: Git Config
         run: |
