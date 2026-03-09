@@ -48,6 +48,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy virtualenv from builder
 COPY --from=builder /app/.venv /app/.venv
 
+# Copy source code
+COPY morphosx /app/morphosx
+
 # Add virtualenv to PATH
 ENV PATH="/app/.venv/bin:$PATH"
 
