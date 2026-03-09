@@ -1,3 +1,13 @@
+## v0.8.13 (2026-03-09)
+
+### Fix
+
+- restore commitizen configuration
+
+### Refactor
+
+- migrate from poetry to uv and fix circular imports
+
 ## v0.8.12 (2026-03-09)
 
 ### Fix
