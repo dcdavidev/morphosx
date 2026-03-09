@@ -38,9 +38,14 @@ WORKDIR /app
 # Install runtime system dependencies
 # ffmpeg: for video/audio processing
 # libvips: for high-performance image engine
+# curl, ca-certificates: to install infisical cli
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libvips \
+    curl \
+    ca-certificates \
+    && curl -1sLf 'https://infisical.com/packages/setup.deb.sh' | bash \
+    && apt-get install -y --no-install-recommends infisical \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed python packages from builder
