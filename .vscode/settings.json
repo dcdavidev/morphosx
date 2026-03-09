@@ -99,6 +99,17 @@
     }
   ],
   "cSpell.enabled": true,
+  "cSpell.words": [
+    "buildx",
+    "dcdavidev",
+    "DOCKERHUB",
+    "morphosx",
+    "pypa",
+    "pypi",
+    "pyproject",
+    "snok",
+    "virtualenvs"
+  ],
   "conventionalCommits.emojiFormat": "emoji",
   "conventionalCommits.gitmoji": true,
   "conventionalCommits.promptBody": true,
