@@ -8,8 +8,6 @@ on:
       - "CHANGELOG.md"
       - "pyproject.toml"
       - "morphosx/app/__init__.py"
-  release:
-    types: [published]
   workflow_dispatch:
 
 jobs:
