@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - "CHANGELOG.md"
-      - "pyproject.toml"
-      - "morphosx/app/__init__.py"
   workflow_dispatch:
 
 jobs:
@@ -43,7 +39,17 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run Release
-        run: uv run poe release
+        # Exit code 21 means "no commits to bump", we treat it as success
+        run: |
+          uv run poe release || {
+            RET=$?
+            if [ $RET -eq 21 ]; then
+              echo "No commits to bump, skipping."
+              exit 0
+            else
+              exit $RET
+            fi
+          }
 
       - name: Push changes
         run: |
