@@ -1,3 +1,9 @@
+## v0.8.15 (2026-03-09)
+
+### Fix
+
+- **docker**: copy source code to runtime stage
+
 ## v0.8.14 (2026-03-09)
 
 ### Fix
