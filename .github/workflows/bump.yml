@@ -14,8 +14,10 @@ jobs:
   bump:
     name: Automated Version Bump
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,16 +37,17 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-interaction
 
-      - name: Git Config
+      - name: Configure Git
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Run Release (cz bump)
-        run: poetry run poe release || echo "No changes to bump"
+      - name: Run Release
+        run: poetry run poe release
 
-      - name: Push changes and tags
+      - name: Push changes
         run: |
-          git push origin main --follow-tags
+          git push
+          git push --tags
