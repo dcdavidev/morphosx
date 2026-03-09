@@ -109,7 +109,7 @@ version_files = [
   "pyproject.toml:version",
   "morphosx/app/__init__.py:__version__",
 ]
-bump_message = "chore: version $current_version → $new_version [skip ci]"
+bump_message = "chore: version $current_version → $new_version"
 bump_pattern = "^(feat|fix|refactor|perf|ci|chore)"
 change_type_map = { "feat" = "Feat", "fix" = "Fix", "refactor" = "Refactor", "perf" = "Perf", "ci" = "CI", "chore" = "Chore" }
 
