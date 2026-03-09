@@ -36,3 +36,23 @@ def sample_md():
 def options():
     """Default processing options."""
     return ProcessingOptions(width=200, height=200, format=ImageFormat.WEBP)
+
+@pytest.fixture
+def real_image():
+    with open("tests/assets/sample.jpg", "rb") as f:
+        return f.read()
+
+@pytest.fixture
+def real_json():
+    with open("tests/assets/sample.json", "rb") as f:
+        return f.read()
+
+@pytest.fixture
+def real_md():
+    with open("tests/assets/sample.md", "rb") as f:
+        return f.read()
+
+@pytest.fixture
+def real_docx():
+    with open("tests/assets/sample.docx", "rb") as f:
+        return f.read()
