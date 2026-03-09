@@ -1,3 +1,9 @@
+## v0.8.9 (2026-03-09)
+
+### Fix
+
+- **docker**: use official infisical cloudsmith repo and libvips42 for Debian Bookworm
+
 ## v0.8.8 (2026-03-09)
 
 ### Fix
