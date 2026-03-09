@@ -56,3 +56,8 @@ def real_md():
 def real_docx():
     with open("tests/assets/sample.docx", "rb") as f:
         return f.read()
+
+@pytest.fixture
+def real_ifc():
+    with open("tests/assets/Ifc4_SampleHouse.ifc", "rb") as f:
+        return f.read()
