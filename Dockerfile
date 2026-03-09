@@ -44,8 +44,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvips \
     curl \
     ca-certificates \
+    gnupg \
+    apt-transport-https \
     && curl -1sLf 'https://infisical.com/packages/setup.deb.sh' | bash \
-    && apt-get install -y --no-install-recommends infisical \
+    && apt-get update && apt-get install -y --no-install-recommends infisical \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed python packages from builder
