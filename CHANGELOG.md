@@ -1,3 +1,9 @@
+## v0.8.10 (2026-03-09)
+
+### Fix
+
+- **audio**: add missing typing imports to resolve NameError
+
 ## v0.8.9 (2026-03-09)
 
 ### Fix
