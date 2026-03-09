@@ -41,14 +41,13 @@ WORKDIR /app
 # curl, ca-certificates: to install infisical cli
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
-    libvips \
+    libvips42 \
     curl \
     ca-certificates \
     gnupg \
-    apt-transport-https \
-    && curl -1sLf 'https://infisical.com/packages/setup.deb.sh' | bash \
-    && apt-get update && apt-get install -y --no-install-recommends infisical \
-    && rm -rf /var/lib/apt/lists/*
+    && curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | bash \
+    && apt-get update && apt-get install -y infisical \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy installed python packages from builder
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
