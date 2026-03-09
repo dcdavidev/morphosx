@@ -1,3 +1,15 @@
+## v0.8.3 (2026-03-09)
+
+### Fix
+
+- ci
+- triggerer
+- edit bump commit message
+
+### Refactor
+
+- implement pluggable processor registry and standardized storage
+
 ## v0.8.2 (2026-03-09)
 
 ### Fix

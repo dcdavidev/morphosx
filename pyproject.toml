@@ -1,6 +1,6 @@
 [project]
 name = "morphosx"
-version = "0.8.2"
+version = "0.8.3"
 description = "high-performance media processing engine for on-the-fly image transformations and storage."
 authors = [{ name = "Davide Di Criscito" }]
 license = "MIT"
@@ -101,7 +101,7 @@ line_length = 88
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.8.2"
+version = "0.8.3"
 tag_format = "v$version"
 update_changelog_on_bump = true
 major_version_zero = true
