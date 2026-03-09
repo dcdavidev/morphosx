@@ -1,3 +1,9 @@
+## v0.8.8 (2026-03-09)
+
+### Fix
+
+- **docker**: ensure gnupg and apt-transport-https are installed before adding infisical repo
+
 ## v0.8.7 (2026-03-09)
 
 ### Fix
