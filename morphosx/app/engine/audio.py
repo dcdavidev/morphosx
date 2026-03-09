@@ -3,10 +3,24 @@ import os
 import tempfile
 
 
-class AudioProcessor:
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class AudioProcessor(BaseProcessor):
     """
     Core engine for audio manipulation and waveform generation.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Generate a waveform and process it as an image.
+        """
+        waveform_bytes = self.generate_waveform(source_data, options.width or 800, options.height or 200)
+        return self.image_processor.process(waveform_bytes, options)
 
     def generate_waveform(self, audio_data: bytes, width: int = 800, height: int = 200, color: str = 'cyan') -> bytes:
         """

@@ -12,12 +12,29 @@ from PIL import Image
 from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
 
 
-class TextProcessor:
+from morphosx.app.engine.base import BaseProcessor
+
+class TextProcessor(BaseProcessor):
     """
     Core engine for processing and rendering text-based files (Markdown, JSON, XML).
     
     Can minify/prettify data or render it as a syntax-highlighted image.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Render to image or return as minified text depending on requested format.
+        """
+        # If an image format is requested, render it
+        if options.format not in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
+            rendered_bytes = self.render_to_image(source_data, filename or "file.txt", options)
+            return self.image_processor.process(rendered_bytes, options)
+
+        # Otherwise, process as text
+        return self.process_text(source_data, filename or "file.txt")
 
     def render_to_image(self, text_data: bytes, filename: str, options: ProcessingOptions) -> bytes:
         """

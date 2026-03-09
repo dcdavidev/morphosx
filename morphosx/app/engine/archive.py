@@ -4,10 +4,25 @@ import tarfile
 from PIL import Image, ImageDraw
 
 
-class ArchiveProcessor:
+from typing import Tuple, Optional
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class ArchiveProcessor(BaseProcessor):
     """
     Engine for generating content-list previews for ZIP and TAR archives.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Generate archive card and process it as an image.
+        """
+        card_bytes = self.render_thumbnail(source_data, filename or "archive.zip")
+        return self.image_processor.process(card_bytes, options)
 
     def render_thumbnail(self, archive_data: bytes, filename: str) -> bytes:
         """

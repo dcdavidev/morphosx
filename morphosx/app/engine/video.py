@@ -4,12 +4,26 @@ import tempfile
 from typing import Tuple, Optional
 
 
-class VideoProcessor:
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class VideoProcessor(BaseProcessor):
     """
     Core engine for video metadata and thumbnail extraction.
     
     Uses FFmpeg for high-performance frame manipulation.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Extract a frame and process it as an image.
+        """
+        frame_bytes = self.extract_thumbnail(source_data, options.time)
+        return self.image_processor.process(frame_bytes, options)
 
     def extract_thumbnail(self, video_data: bytes, timestamp: float = 0.0) -> bytes:
         """

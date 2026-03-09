@@ -1,10 +1,25 @@
 import io
 
 
-class DocumentProcessor:
+from typing import Tuple, Optional
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class DocumentProcessor(BaseProcessor):
     """
     Core engine for document (PDF) processing.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Extract a page and process it as an image.
+        """
+        page_bytes = self.extract_page_as_image(source_data, options.page, dpi=150)
+        return self.image_processor.process(page_bytes, options)
 
     def extract_page_as_image(self, document_data: bytes, page_number: int = 1, dpi: int = 150) -> bytes:
         """

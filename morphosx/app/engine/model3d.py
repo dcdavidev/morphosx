@@ -3,12 +3,46 @@ import trimesh
 from PIL import Image, ImageDraw
 
 
-class Model3DProcessor:
+import json
+import yaml
+import xml.etree.ElementTree as ET
+from typing import Tuple, Optional
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
+
+
+class Model3DProcessor(BaseProcessor):
     """
     Engine for generating 2D previews and metadata for 3D Models (STL, OBJ, GLB).
-    
-    Generates a 'Blueprint' card with model metadata and a bounding box summary.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Generate blueprint or return metadata.
+        """
+        if options.format in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
+            metadata = self.get_metadata(source_data, filename or "model.obj")
+            if options.format == ImageFormat.JSON:
+                return json.dumps(metadata, indent=2).encode("utf-8"), "application/json"
+            elif options.format == ImageFormat.YAML:
+                return yaml.dump(metadata, sort_keys=False).encode("utf-8"), "application/x-yaml"
+            elif options.format == ImageFormat.XML:
+                root = ET.Element("metadata")
+                def build_xml(parent, data):
+                    if isinstance(data, dict):
+                        for k, v in data.items():
+                            child = ET.SubElement(parent, k)
+                            build_xml(child, v)
+                    else:
+                        parent.text = str(data)
+                build_xml(root, metadata)
+                return ET.tostring(root, encoding="utf-8"), "application/xml"
+
+        blueprint_bytes = self.render_thumbnail(source_data, filename or "model.obj")
+        return self.image_processor.process(blueprint_bytes, options)
 
     def get_metadata(self, model_data: bytes, filename: str) -> dict:
         """

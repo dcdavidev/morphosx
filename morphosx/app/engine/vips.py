@@ -3,7 +3,9 @@ from typing import Optional, Tuple
 from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
 
 
-class VipsProcessor:
+from morphosx.app.engine.base import BaseProcessor
+
+class VipsProcessor(BaseProcessor):
     """
     High-performance image transformation engine using libvips (via pyvips).
     
@@ -11,13 +13,9 @@ class VipsProcessor:
     for large image operations due to its tiled, streaming architecture.
     """
 
-    def process(self, source_data: bytes, options: ProcessingOptions) -> Tuple[bytes, str]:
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
         """
         Apply transformations using libvips.
-        
-        :param source_data: Raw image bytes.
-        :param options: Transformation parameters.
-        :return: A tuple of (processed bytes, mime type).
         """
         try:
             import pyvips

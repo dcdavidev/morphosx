@@ -2,10 +2,25 @@ import io
 from PIL import Image
 
 
-class RawProcessor:
+from typing import Tuple, Optional
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class RawProcessor(BaseProcessor):
     """
     Core engine for processing RAW image formats (e.g., CR2, NEF, DNG, ARW).
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Extract preview and process it as an image.
+        """
+        preview_bytes = self.extract_preview(source_data)
+        return self.image_processor.process(preview_bytes, options)
 
     def extract_preview(self, raw_data: bytes) -> bytes:
         """

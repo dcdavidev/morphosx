@@ -26,9 +26,11 @@ from morphosx.app.storage.s3 import S3Storage
 from morphosx.app.settings import settings
 
 
+from morphosx.app.engine.base import initialize_registry
+
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
-# Singleton instances factory
+# Singleton instances
 def get_storage():
     if settings.storage_type == "s3":
         if not settings.s3_bucket:
@@ -42,35 +44,17 @@ def get_storage():
         )
     return LocalStorage(base_directory=settings.storage_path)
 
-def get_processor():
-    if settings.engine_type == "vips":
-        return VipsProcessor()
-    return ImageProcessor()
-
 storage = get_storage()
-processor = get_processor()
-video_processor = VideoProcessor()
-audio_processor = AudioProcessor()
-document_processor = DocumentProcessor()
-raw_processor = RawProcessor()
-text_processor = TextProcessor()
-office_processor = OfficeProcessor()
-font_processor = FontProcessor()
-model3d_processor = Model3DProcessor()
-archive_processor = ArchiveProcessor()
-bim_processor = BIMProcessor()
+processor_registry = initialize_registry()
 
-VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi"}
-AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".flac"}
-DOCUMENT_EXTENSIONS = {".pdf"}
-RAW_EXTENSIONS = {".cr2", ".nef", ".dng", ".arw"}
-TEXT_EXTENSIONS = {".json", ".xml", ".md"}
-OFFICE_EXTENSIONS = {".docx", ".pptx", ".xlsx"}
-FONT_EXTENSIONS = {".ttf", ".otf"}
-MODEL3D_EXTENSIONS = {".stl", ".obj", ".glb", ".gltf"}
-ARCHIVE_EXTENSIONS = {".zip", ".tar", ".gz"}
-BIM_EXTENSIONS = {".ifc"}
-
+def get_mime_type(fmt: ImageFormat) -> str:
+    if fmt == ImageFormat.JSON:
+        return "application/json"
+    elif fmt == ImageFormat.YAML:
+        return "application/x-yaml"
+    elif fmt == ImageFormat.XML:
+        return "application/xml"
+    return f"image/{fmt.value.lower()}"
 
 
 @router.post("/upload")
@@ -113,7 +97,7 @@ async def upload_asset(
         clean_id = saved_id if private else Path(saved_id).name
         
         # Determine if it's a video to suggest thumbnail params
-        is_video = ext.lower() in VIDEO_EXTENSIONS
+        is_video = ext.lower() in {".mp4", ".webm", ".mov", ".avi"}
         
         # Generate a sample signed URL
         sample_fmt = ImageFormat.WEBP
@@ -142,16 +126,6 @@ async def upload_asset(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
-
-
-def get_mime_type(fmt: ImageFormat) -> str:
-    if fmt == ImageFormat.JSON:
-        return "application/json"
-    elif fmt == ImageFormat.YAML:
-        return "application/x-yaml"
-    elif fmt == ImageFormat.XML:
-        return "application/xml"
-    return f"image/{fmt.value.lower()}"
 
 
 @router.get("/{asset_id:path}")
@@ -189,7 +163,6 @@ async def get_processed_asset(
         target_q = q if q else config.get("quality", settings.default_quality)
 
     # 1. Signature Verification (SECURITY FIRST)
-    # We enforce that if an asset is in the "users/" directory, it MUST have a matching current_user
     is_private = asset_id.startswith("users/")
     if is_private:
         # Extract owner ID from path: "users/{user_id}/file.jpg"
@@ -224,19 +197,13 @@ async def get_processed_asset(
         width=target_w,
         height=target_h,
         format=target_fmt,
-        quality=target_q
+        quality=target_q,
+        time=t,
+        page=p
     )
     
-    # 2. Define Cache Paths (Include timestamp or page for media derivatives)
+    # 2. Define Cache Paths
     cache_key = options.get_cache_key()
-    is_video = Path(asset_id).suffix.lower() in VIDEO_EXTENSIONS
-    is_document = Path(asset_id).suffix.lower() in DOCUMENT_EXTENSIONS
-    
-    if is_video:
-        cache_key = f"t{t}_{cache_key}"
-    elif is_document:
-        cache_key = f"p{p}_{cache_key}"
-
     derivative_id = f"cache/{asset_id}/{cache_key}"
 
     try:
@@ -259,95 +226,12 @@ async def get_processed_asset(
         original_id = f"originals/{asset_id}"
         source_bytes = await storage.get_asset(original_id)
         
-        # 6. Transform Pipeline
-        is_audio = Path(asset_id).suffix.lower() in AUDIO_EXTENSIONS
-        is_raw = Path(asset_id).suffix.lower() in RAW_EXTENSIONS
-        is_text = Path(asset_id).suffix.lower() in TEXT_EXTENSIONS
-        is_office = Path(asset_id).suffix.lower() in OFFICE_EXTENSIONS
-        is_font = Path(asset_id).suffix.lower() in FONT_EXTENSIONS
-        is_model3d = Path(asset_id).suffix.lower() in MODEL3D_EXTENSIONS
-        is_archive = Path(asset_id).suffix.lower() in ARCHIVE_EXTENSIONS
-        is_bim = Path(asset_id).suffix.lower() in BIM_EXTENSIONS
-
-        # Check if we want metadata (JSON, YAML, XML) instead of an image
-        if options.format in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
-            metadata = {}
-            if is_bim:
-                metadata = bim_processor.get_metadata(source_bytes)
-            elif is_model3d:
-                metadata = model3d_processor.get_metadata(source_bytes, asset_id)
-            else:
-                # Fallback for other types: basic file info
-                metadata = {
-                    "asset_id": asset_id,
-                    "size": len(source_bytes),
-                    "extension": Path(asset_id).suffix.lower()
-                }
-
-            if options.format == ImageFormat.JSON:
-                processed_data = json.dumps(metadata, indent=2).encode("utf-8")
-                mime_type = "application/json"
-            elif options.format == ImageFormat.YAML:
-                processed_data = yaml.dump(metadata, sort_keys=False).encode("utf-8")
-                mime_type = "application/x-yaml"
-            elif options.format == ImageFormat.XML:
-                # Simple dict to XML conversion
-                root = ET.Element("metadata")
-                def build_xml(parent, data):
-                    if isinstance(data, dict):
-                        for k, v in data.items():
-                            child = ET.SubElement(parent, k)
-                            build_xml(child, v)
-                    else:
-                        parent.text = str(data)
-                build_xml(root, metadata)
-                processed_data = ET.tostring(root, encoding="utf-8")
-                mime_type = "application/xml"
-        
-        elif is_video:
-            # Video: Extract Frame -> Process as Image
-            frame_bytes = video_processor.extract_thumbnail(source_bytes, t)
-            processed_data, mime_type = processor.process(frame_bytes, options)
-        elif is_audio:
-            # Audio: Generate Waveform -> Process as Image
-            waveform_bytes = audio_processor.generate_waveform(source_bytes, w or 800, h or 200)
-            processed_data, mime_type = processor.process(waveform_bytes, options)
-        elif is_document:
-            # Document: Extract Page -> Process as Image
-            # We extract at 150 DPI to ensure crisp text before potential downscaling
-            page_bytes = document_processor.extract_page_as_image(source_bytes, p, dpi=150)
-            processed_data, mime_type = processor.process(page_bytes, options)
-        elif is_raw:
-            # RAW: Extract Preview -> Process as Image
-            preview_bytes = raw_processor.extract_preview(source_bytes)
-            processed_data, mime_type = processor.process(preview_bytes, options)
-        elif is_text:
-            # Text: Render to Image -> Process as Image
-            rendered_bytes = text_processor.render_to_image(source_bytes, asset_id, options)
-            processed_data, mime_type = processor.process(rendered_bytes, options)
-        elif is_office:
-            # Office: Generate Summary Card -> Process as Image
-            office_card_bytes = office_processor.render_thumbnail(source_bytes, asset_id)
-            processed_data, mime_type = processor.process(office_card_bytes, options)
-        elif is_font:
-            # Font: Render Specimen -> Process as Image
-            specimen_bytes = font_processor.render_specimen(source_bytes, {})
-            processed_data, mime_type = processor.process(specimen_bytes, options)
-        elif is_model3d:
-            # 3D: Generate Blueprint -> Process as Image
-            model_bytes = model3d_processor.render_thumbnail(source_bytes, asset_id)
-            processed_data, mime_type = processor.process(model_bytes, options)
-        elif is_archive:
-            # Archive: Generate Content List -> Process as Image
-            archive_bytes = archive_processor.render_thumbnail(source_bytes, asset_id)
-            processed_data, mime_type = processor.process(archive_bytes, options)
-        elif is_bim:
-            # BIM: Generate Building Data Card -> Process as Image
-            bim_bytes = bim_processor.render_summary(source_bytes, asset_id)
-            processed_data, mime_type = processor.process(bim_bytes, options)
-        else:
-            # Image: Process directly
-            processed_data, mime_type = processor.process(source_bytes, options)
+        # 6. Transform Pipeline (Using Registry)
+        processor = processor_registry.get_processor(asset_id)
+        if not processor:
+             raise HTTPException(status_code=415, detail="Unsupported media type")
+             
+        processed_data, mime_type = processor.process(source_bytes, options, filename=asset_id)
         
         # 7. Store derivative for future requests
         await storage.save_asset(derivative_id, processed_data)
@@ -365,34 +249,34 @@ async def get_processed_asset(
         raise HTTPException(status_code=404, detail="Asset not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+
+
+@router.get("/list/{path:path}")
+async def list_assets(
+    path: str = "",
+    current_user: Optional[str] = Depends(get_current_user)
+):
+    """
+    List files and folders in a given path.
+    """
+    # Security: If path starts with users/, verify ownership
+    if path.startswith("users/"):
+        parts = path.split("/")
+        if len(parts) >= 2:
+            owner_id = parts[1]
+            if current_user != owner_id:
+                raise HTTPException(status_code=403, detail="Not authorized to browse this folder")
     
-    
-    @router.get("/list/{path:path}")
-    async def list_assets(
-        path: str = "",
-        current_user: Optional[str] = Depends(get_current_user)
-    ):
-        """
-        List files and folders in a given path.
-        """
-        # Security: If path starts with users/, verify ownership
-        if path.startswith("users/"):
-            parts = path.split("/")
-            if len(parts) >= 2:
-                owner_id = parts[1]
-                if current_user != owner_id:
-                    raise HTTPException(status_code=403, detail="Not authorized to browse this folder")
-        
-        # If path is empty, default to listing 'originals/' (public root)
-        if not path:
-            path = "originals"
-    
-        try:
-            items = await storage.list_assets(path)
-            return {
-                "path": path,
-                "items": items
-            }
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Listing failed: {str(e)}")
+    # If path is empty, default to listing 'originals/' (public root)
+    if not path:
+        path = "originals"
+
+    try:
+        items = await storage.list_assets(path)
+        return {
+            "path": path,
+            "items": items
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Listing failed: {str(e)}")
     

@@ -2,10 +2,25 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 
 
-class FontProcessor:
+from typing import Tuple, Optional
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class FontProcessor(BaseProcessor):
     """
     Engine for generating font specimen images from TTF/OTF files.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Generate specimen and process it as an image.
+        """
+        specimen_bytes = self.render_specimen(source_data, {})
+        return self.image_processor.process(specimen_bytes, options)
 
     def render_specimen(self, font_data: bytes, options: dict) -> bytes:
         """

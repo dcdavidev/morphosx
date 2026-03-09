@@ -3,13 +3,27 @@ from typing import Tuple
 from PIL import Image, ImageDraw, ImageFont
 
 
-class OfficeProcessor:
+from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ProcessingOptions
+
+
+class OfficeProcessor(BaseProcessor):
     """
     Engine for generating previews/thumbnails for Office Documents.
     
     Since pure Python rendering of Office to perfect PDF/Image is extremely 
     complex, we generate a 'Summary Card' image.
     """
+
+    def __init__(self, image_processor: BaseProcessor):
+        self.image_processor = image_processor
+
+    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+        """
+        Generate summary card and process it as an image.
+        """
+        card_bytes = self.render_thumbnail(source_data, filename or "doc.docx")
+        return self.image_processor.process(card_bytes, options)
 
     def render_thumbnail(self, doc_data: bytes, filename: str) -> bytes:
         """
