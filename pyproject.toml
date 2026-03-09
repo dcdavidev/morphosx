@@ -118,6 +118,7 @@ change_type_map = { "feat" = "Feat", "fix" = "Fix", "refactor" = "Refactor", "pe
 release = "cz bump --changelog --check-consistency --yes"
 commit = "cz commit"
 check = "pytest tests/"
+lint = "flake8 morphosx/ tests/"
 clean = "rm -rf storage/cache/*"
 start = "uvicorn morphosx.app.main:app --reload --host 0.0.0.0 --port 6100"
 test = "pytest tests/test_processor.py -s"
