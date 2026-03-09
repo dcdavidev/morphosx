@@ -96,6 +96,20 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.8.12"
+tag_format = "v$version"
+update_changelog_on_bump = true
+major_version_zero = true
+version_files = [
+    "pyproject.toml:version",
+    "morphosx/app/__init__.py:__version__",
+]
+bump_message = "chore: version $current_version → $new_version"
+bump_pattern = "^(feat|fix|refactor|perf|ci|chore)"
+change_type_map = { "feat" = "Feat", "fix" = "Fix", "refactor" = "Refactor", "perf" = "Perf", "ci" = "CI", "chore" = "Chore" }
+
 [tool.poe.tasks]
 release = "cz bump --changelog --check-consistency --yes"
 commit = "cz commit"
