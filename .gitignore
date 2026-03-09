@@ -9,9 +9,13 @@ env/
 venv/
 ENV/
 
-# Poetry
-# Note: we DO commit poetry.lock, but not the virtualenv
+# uv / Virtual Environments
+# Note: we DO commit uv.lock, but not the virtualenv
 .python-version
+.venv/
+.uv/
+uv.lock.tmp
+
 
 # OS specific
 .DS_Store

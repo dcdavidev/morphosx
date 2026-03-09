@@ -17,7 +17,7 @@ MorphosX is built on:
 - **FastAPI**: For a high-performance, asynchronous API interface.
 - **Libvips / Pillow**: For low-latency image processing.
 - **FFmpeg**: For video and audio support.
-- **Poetry**: For Python dependency management.
+- **uv**: For Python dependency and project management (high-performance).
 
 ## Quick Install (Docker)
 
