@@ -1,3 +1,14 @@
+## v0.8.1 (2026-03-09)
+
+### Fix
+
+- tag
+- ci
+- ci
+- ignore release
+- trigger ci
+- add infisical to docker image
+
 ## v0.8.0 (2026-03-06)
 
 ### Feat
