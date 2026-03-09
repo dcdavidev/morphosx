@@ -1,10 +1,10 @@
 import io
-import zipfile
 import tarfile
+import zipfile
+from typing import Optional, Tuple
+
 from PIL import Image, ImageDraw
 
-
-from typing import Tuple, Optional
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
 
@@ -17,7 +17,12 @@ class ArchiveProcessor(BaseProcessor):
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Generate archive card and process it as an image.
         """
@@ -39,29 +44,33 @@ class ArchiveProcessor(BaseProcessor):
                 with tarfile.open(fileobj=io.BytesIO(archive_data)) as t:
                     file_list = [f.name for f in t.getmembers()[:15]]
                     total = len(t.getmembers())
-            
+
             summary = "\n".join(file_list)
             if total > 15:
                 summary += f"\n... and {total - 15} more files."
-            
+
             title = f"Archive: {filename} ({total} files)"
             return self._create_folder_card(title, summary)
-            
+
         except Exception as e:
-            return self._create_folder_card("Archive Error", f"Could not read archive: {str(e)}")
+            return self._create_folder_card(
+                "Archive Error", f"Could not read archive: {str(e)}"
+            )
 
     def _create_folder_card(self, title: str, text: str) -> bytes:
         """Render a folder-style card image."""
         width, height = 800, 600
-        img = Image.new("RGB", (width, height), color=(255, 250, 230)) # Manila folder yellow
+        img = Image.new(
+            "RGB", (width, height), color=(255, 250, 230)
+        )  # Manila folder yellow
         draw = ImageDraw.Draw(img)
-        
+
         # Draw a folder 'tab'
         draw.rectangle([20, 10, 200, 40], fill=(210, 180, 100))
-        
+
         # Draw main folder body
         draw.rectangle([20, 40, 780, 580], outline=(180, 150, 80), width=3)
-        
+
         # Draw text
         draw.text((40, 60), title, fill=(100, 80, 20))
         draw.text((40, 110), text, fill=(60, 50, 30))

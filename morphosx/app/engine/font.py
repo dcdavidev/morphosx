@@ -1,8 +1,8 @@
 import io
+from typing import Optional, Tuple
+
 from PIL import Image, ImageDraw, ImageFont
 
-
-from typing import Tuple, Optional
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
 
@@ -15,7 +15,12 @@ class FontProcessor(BaseProcessor):
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Generate specimen and process it as an image.
         """
@@ -30,11 +35,11 @@ class FontProcessor(BaseProcessor):
             width, height = 1200, 800
             img = Image.new("RGB", (width, height), color=(255, 255, 255))
             draw = ImageDraw.Draw(img)
-            
+
             # Load the font from bytes
             font_size = 48
             font = ImageFont.truetype(io.BytesIO(font_data), font_size)
-            
+
             # Specimen text
             lines = [
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -46,20 +51,22 @@ class FontProcessor(BaseProcessor):
                 "",
                 "Large size (72pt):",
             ]
-            
+
             y = 40
             for line in lines:
                 draw.text((40, y), line, font=font, fill=(0, 0, 0))
                 y += font_size + 10
-            
+
             # Draw a larger sample
             large_font = ImageFont.truetype(io.BytesIO(font_data), 72)
-            draw.text((40, y), "MorphosX Media Engine", font=large_font, fill=(43, 108, 176))
+            draw.text(
+                (40, y), "MorphosX Media Engine", font=large_font, fill=(43, 108, 176)
+            )
 
             output = io.BytesIO()
             img.save(output, format="JPEG")
             return output.getvalue()
-            
+
         except Exception as e:
             # Fallback image if font is corrupted
             img = Image.new("RGB", (400, 200), color=(255, 0, 0))

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 from morphosx.app.storage.models import AssetMetadata
 
 
@@ -20,7 +21,7 @@ class BaseStorage(ABC):
     async def list_assets(self, prefix: str) -> List[AssetMetadata]:
         """
         List assets and sub-folders starting with a given prefix.
-        
+
         :param prefix: The folder path to list.
         :return: A list of AssetMetadata objects.
         """

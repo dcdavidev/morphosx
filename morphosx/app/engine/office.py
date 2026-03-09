@@ -1,7 +1,7 @@
 import io
-from typing import Tuple, Optional
-from PIL import Image, ImageDraw, ImageFont
+from typing import Optional, Tuple
 
+from PIL import Image, ImageDraw
 
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
@@ -10,15 +10,20 @@ from morphosx.app.engine.processor import ProcessingOptions
 class OfficeProcessor(BaseProcessor):
     """
     Engine for generating previews/thumbnails for Office Documents.
-    
-    Since pure Python rendering of Office to perfect PDF/Image is extremely 
+
+    Since pure Python rendering of Office to perfect PDF/Image is extremely
     complex, we generate a 'Summary Card' image.
     """
 
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Generate summary card and process it as an image.
         """
@@ -31,10 +36,13 @@ class OfficeProcessor(BaseProcessor):
         """
         try:
             from docx import Document
-            from pptx import Presentation
             from openpyxl import load_workbook
+            from pptx import Presentation
         except ImportError:
-            raise RuntimeError("python-docx, python-pptx, or openpyxl are not installed. Run 'pip install morphosx[office]' to enable this feature.")
+            raise RuntimeError(
+                "python-docx, python-pptx, or openpyxl are not installed. "
+                "Run 'pip install morphosx[office]' to enable this feature."
+            )
 
         ext = filename.split(".")[-1].lower()
         title = "Office Document"
@@ -45,13 +53,17 @@ class OfficeProcessor(BaseProcessor):
                 doc = Document(io.BytesIO(doc_data))
                 title = "Word Document"
                 # Extract first 5 paragraphs
-                summary = "\n".join([p.text for p in doc.paragraphs[:5] if p.text.strip()])
+                summary = "\n".join(
+                    [p.text for p in doc.paragraphs[:5] if p.text.strip()]
+                )
             elif ext == "pptx":
                 prs = Presentation(io.BytesIO(doc_data))
                 title = f"PowerPoint ({len(prs.slides)} slides)"
                 if len(prs.slides) > 0:
                     slide = prs.slides[0]
-                    summary = "\n".join([shape.text for shape in slide.shapes if hasattr(shape, "text")])
+                    summary = "\n".join(
+                        [shape.text for shape in slide.shapes if hasattr(shape, "text")]
+                    )
             elif ext == "xlsx":
                 wb = load_workbook(io.BytesIO(doc_data), data_only=True)
                 ws = wb.active
@@ -63,19 +75,21 @@ class OfficeProcessor(BaseProcessor):
                 summary = "\n".join(rows)
 
             return self._create_summary_card(title, summary[:500])
-            
+
         except Exception as e:
-            return self._create_summary_card("Error", f"Could not parse office file: {str(e)}")
+            return self._create_summary_card(
+                "Error", f"Could not parse office file: {str(e)}"
+            )
 
     def _create_summary_card(self, title: str, text: str) -> bytes:
         """Render a text-based summary card image."""
         width, height = 800, 600
         img = Image.new("RGB", (width, height), color=(240, 240, 240))
         draw = ImageDraw.Draw(img)
-        
+
         # Draw a header bar
         draw.rectangle([0, 0, width, 60], fill=(43, 108, 176))
-        
+
         # Simple text drawing (fallback to default if font missing)
         try:
             # We don't want to rely on specific paths, use default

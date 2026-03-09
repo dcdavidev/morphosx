@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict, Type, Optional, List
+from typing import Dict, List, Optional, Tuple
+
 from morphosx.app.engine.processor import ProcessingOptions
 
 
@@ -9,10 +10,15 @@ class BaseProcessor(ABC):
     """
 
     @abstractmethod
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Process the source data and return transformed bytes and MIME type.
-        
+
         :param source_data: Raw bytes of the original asset.
         :param options: Transformation and formatting options.
         :param filename: Optional filename to help with type detection.
@@ -24,10 +30,7 @@ class BaseProcessor(ABC):
         """
         Extract metadata from the asset. Default implementation returns basic info.
         """
-        return {
-            "size": len(source_data),
-            "filename": filename
-        }
+        return {"size": len(source_data), "filename": filename}
 
 
 class ProcessorRegistry:
@@ -41,13 +44,13 @@ class ProcessorRegistry:
 
     def register(self, extensions: List[str], processor: BaseProcessor):
         for ext in extensions:
-            self._processors[ext.lower().lstrip('.')] = processor
+            self._processors[ext.lower().lstrip(".")] = processor
 
     def set_default(self, processor: BaseProcessor):
         self._default_processor = processor
 
     def get_processor(self, filename: str) -> BaseProcessor:
-        ext = filename.split('.')[-1].lower() if '.' in filename else ''
+        ext = filename.split(".")[-1].lower() if "." in filename else ""
         return self._processors.get(ext, self._default_processor)
 
 
@@ -59,18 +62,18 @@ def initialize_registry():
     """
     Bootstrap the processor registry with all available engines.
     """
-    from morphosx.app.engine.processor import ImageProcessor, ImageFormat
-    from morphosx.app.engine.vips import VipsProcessor
-    from morphosx.app.engine.video import VideoProcessor
+    from morphosx.app.engine.archive import ArchiveProcessor
     from morphosx.app.engine.audio import AudioProcessor
+    from morphosx.app.engine.bim import BIMProcessor
     from morphosx.app.engine.document import DocumentProcessor
-    from morphosx.app.engine.raw import RawProcessor
-    from morphosx.app.engine.text import TextProcessor
-    from morphosx.app.engine.office import OfficeProcessor
     from morphosx.app.engine.font import FontProcessor
     from morphosx.app.engine.model3d import Model3DProcessor
-    from morphosx.app.engine.archive import ArchiveProcessor
-    from morphosx.app.engine.bim import BIMProcessor
+    from morphosx.app.engine.office import OfficeProcessor
+    from morphosx.app.engine.processor import ImageProcessor
+    from morphosx.app.engine.raw import RawProcessor
+    from morphosx.app.engine.text import TextProcessor
+    from morphosx.app.engine.video import VideoProcessor
+    from morphosx.app.engine.vips import VipsProcessor
     from morphosx.app.settings import settings
 
     # 1. Initialize core image engine

@@ -1,14 +1,14 @@
 import io
+import json
+import xml.etree.ElementTree as ET
+from typing import Optional, Tuple
+
 import trimesh
+import yaml
 from PIL import Image, ImageDraw
 
-
-import json
-import yaml
-import xml.etree.ElementTree as ET
-from typing import Tuple, Optional
 from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
+from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
 
 
 class Model3DProcessor(BaseProcessor):
@@ -19,18 +19,30 @@ class Model3DProcessor(BaseProcessor):
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Generate blueprint or return metadata.
         """
         if options.format in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
             metadata = self.get_metadata(source_data, filename or "model.obj")
             if options.format == ImageFormat.JSON:
-                return json.dumps(metadata, indent=2).encode("utf-8"), "application/json"
+                return (
+                    json.dumps(metadata, indent=2).encode("utf-8"),
+                    "application/json",
+                )
             elif options.format == ImageFormat.YAML:
-                return yaml.dump(metadata, sort_keys=False).encode("utf-8"), "application/x-yaml"
+                return (
+                    yaml.dump(metadata, sort_keys=False).encode("utf-8"),
+                    "application/x-yaml",
+                )
             elif options.format == ImageFormat.XML:
                 root = ET.Element("metadata")
+
                 def build_xml(parent, data):
                     if isinstance(data, dict):
                         for k, v in data.items():
@@ -38,6 +50,7 @@ class Model3DProcessor(BaseProcessor):
                             build_xml(child, v)
                     else:
                         parent.text = str(data)
+
                 build_xml(root, metadata)
                 return ET.tostring(root, encoding="utf-8"), "application/xml"
 
@@ -58,7 +71,7 @@ class Model3DProcessor(BaseProcessor):
             if isinstance(mesh, trimesh.Scene):
                 # It's a scene (common for GLB)
                 vertices = mesh.vertices.shape[0]
-                faces = len(mesh.graph.nodes) # approximation
+                faces = len(mesh.graph.nodes)  # approximation
                 is_scene = True
             else:
                 vertices = mesh.vertices.shape[0]
@@ -67,7 +80,7 @@ class Model3DProcessor(BaseProcessor):
 
             bounds = mesh.bounds
             size = bounds[1] - bounds[0]
-            
+
             return {
                 "type": "3D_Model",
                 "format": ext.upper(),
@@ -77,9 +90,9 @@ class Model3DProcessor(BaseProcessor):
                 "bounding_box": {
                     "x": float(size[0]),
                     "y": float(size[1]),
-                    "z": float(size[2])
+                    "z": float(size[2]),
                 },
-                "volume": float(getattr(mesh, 'volume', 0))
+                "volume": float(getattr(mesh, "volume", 0)),
             }
         except Exception as e:
             return {"error": f"Could not parse 3D file: {str(e)}"}
@@ -89,7 +102,7 @@ class Model3DProcessor(BaseProcessor):
         Create a preview of the 3D model.
         """
         metadata = self.get_metadata(model_data, filename)
-        
+
         if "error" in metadata:
             return self._create_blueprint_card("3D Model Error", metadata["error"])
 
@@ -109,19 +122,19 @@ class Model3DProcessor(BaseProcessor):
     def _create_blueprint_card(self, title: str, text: str) -> bytes:
         """Render a technical blueprint-style card."""
         width, height = 800, 600
-        img = Image.new("RGB", (width, height), color=(10, 50, 100)) # Blueprint blue
+        img = Image.new("RGB", (width, height), color=(10, 50, 100))  # Blueprint blue
         draw = ImageDraw.Draw(img)
-        
+
         # Draw a grid
         for i in range(0, width, 50):
             draw.line([(i, 0), (i, height)], fill=(30, 80, 150), width=1)
         for i in range(0, height, 50):
             draw.line([(0, i), (width, i)], fill=(30, 80, 150), width=1)
-            
+
         # Draw header
         draw.text((20, 20), title, fill=(255, 255, 255))
         draw.text((20, 80), text, fill=(200, 230, 255))
-        
+
         # Decoration (a simple wireframe box)
         draw.rectangle([500, 300, 750, 550], outline=(255, 255, 255), width=2)
         draw.line([500, 300, 550, 250], fill=(255, 255, 255), width=2)

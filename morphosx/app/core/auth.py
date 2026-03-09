@@ -1,11 +1,14 @@
-from typing import Optional
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+
 from morphosx.app.settings import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", auto_error=False)
+
 
 def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[str]:
     """
@@ -14,7 +17,7 @@ def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[
     """
     if not token:
         return None
-        
+
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
         user_id: str = payload.get("sub")
@@ -28,6 +31,7 @@ def get_current_user(token: Optional[str] = Depends(oauth2_scheme)) -> Optional[
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """

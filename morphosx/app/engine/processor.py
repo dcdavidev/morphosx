@@ -4,20 +4,25 @@ from enum import Enum
 from typing import Optional, Tuple
 
 from PIL import Image
+
+from morphosx.app.engine.base import BaseProcessor
+
 try:
     import pillow_heif
+
     pillow_heif.register_heif_opener()
 except ImportError:
     pass
 
 try:
-    import pillow_avif
+    import pillow_avif  # noqa: F401
 except ImportError:
     pass
 
 
 class ImageFormat(str, Enum):
     """Supported output formats."""
+
     JPEG = "JPEG"
     PNG = "PNG"
     WEBP = "WEBP"
@@ -32,7 +37,7 @@ class ImageFormat(str, Enum):
 class ProcessingOptions:
     """
     Configuration options for image transformations.
-    
+
     :param width: Target width in pixels.
     :param height: Target height in pixels.
     :param format: Output image format (e.g., JPEG, PNG, WEBP).
@@ -40,6 +45,7 @@ class ProcessingOptions:
     :param time: For media with a temporal dimension (video/audio), the timestamp in seconds.
     :param page: For multi-page documents (PDF), the 1-based page index.
     """
+
     width: Optional[int] = None
     height: Optional[int] = None
     format: ImageFormat = ImageFormat.WEBP
@@ -58,20 +64,25 @@ class ProcessingOptions:
         t_part = f"t{self.time}" if self.time > 0 else "t0"
         p_part = f"p{self.page}" if self.page > 1 else "p1"
         ext = self.format.value.lower()
-        
+
         return f"{w_part}_{h_part}_{q_part}_{t_part}_{p_part}.{ext}"
 
 
-from morphosx.app.engine.base import BaseProcessor
+
 
 class ImageProcessor(BaseProcessor):
     """
     Core engine for on-the-fly image transformations.
-    
+
     Handles resizing, format conversion, and optimization using memory buffers.
     """
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Apply transformations to the source image data.
         """
@@ -86,29 +97,31 @@ class ImageProcessor(BaseProcessor):
             # Prepare for export
             output_buffer = io.BytesIO()
             save_params = self._get_save_params(options)
-            
+
             # Convert to RGB if necessary (e.g., saving PNG with alpha to JPEG)
             if options.format == ImageFormat.JPEG and img.mode in ("RGBA", "P"):
                 img = img.convert("RGB")
 
             img.save(output_buffer, format=options.format.value, **save_params)
-            
+
             processed_data = output_buffer.getvalue()
             mime_type = f"image/{options.format.value.lower()}"
-            
+
             return processed_data, mime_type
 
-    def _resize(self, img: Image.Image, width: Optional[int], height: Optional[int]) -> Image.Image:
+    def _resize(
+        self, img: Image.Image, width: Optional[int], height: Optional[int]
+    ) -> Image.Image:
         """
         Resize image while maintaining aspect ratio if only one dimension is provided.
-        
+
         :param img: PIL Image object.
         :param width: Target width.
         :param height: Target height.
         :return: Resized PIL Image object.
         """
         original_width, original_height = img.size
-        
+
         if width and not height:
             height = int((width / original_width) * original_height)
         elif height and not width:
@@ -122,13 +135,14 @@ class ImageProcessor(BaseProcessor):
     def _handle_exif_orientation(self, img: Image.Image) -> Image.Image:
         """
         Fix image orientation based on EXIF metadata.
-        
+
         :param img: PIL Image object.
         :return: Oriented PIL Image object.
         """
         try:
             # This is a built-in helper in Pillow to handle EXIF orientation
             from PIL import ImageOps
+
             return ImageOps.exif_transpose(img)
         except Exception:
             # Fallback to original image if EXIF parsing fails
@@ -137,13 +151,13 @@ class ImageProcessor(BaseProcessor):
     def _get_save_params(self, options: ProcessingOptions) -> dict:
         """
         Generate format-specific save parameters.
-        
+
         :param options: Processing options.
         :return: Dictionary of parameters for Image.save().
         """
         params = {"quality": options.quality}
-        
+
         if options.format == ImageFormat.WEBP:
             params["method"] = 6  # Best compression/speed trade-off
-            
+
         return params

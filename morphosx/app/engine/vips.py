@@ -1,26 +1,32 @@
-import io
 from typing import Optional, Tuple
-from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
-
 
 from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+
 
 class VipsProcessor(BaseProcessor):
     """
     High-performance image transformation engine using libvips (via pyvips).
-    
-    Libvips is significantly faster and uses much less memory than Pillow 
+
+    Libvips is significantly faster and uses much less memory than Pillow
     for large image operations due to its tiled, streaming architecture.
     """
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Apply transformations using libvips.
         """
         try:
-            import pyvips
+            import pyvips  # noqa: F401
         except ImportError:
-            raise RuntimeError("pyvips is not installed. Run 'pip install morphosx[vips]' to enable this feature.")
+            raise RuntimeError(
+                "pyvips is not installed. Run 'pip install morphosx[vips]' to enable this feature."
+            )
 
         try:
             # Load image from memory buffer
@@ -40,13 +46,13 @@ class VipsProcessor(BaseProcessor):
 
             # Prepare saving parameters
             save_params = self._get_save_params(options)
-            
+
             # Export to buffer
             processed_data = img.write_to_buffer(vips_format, **save_params)
             mime_type = f"image/{options.format.value.lower()}"
-            
+
             return processed_data, mime_type
-            
+
         except Exception as e:
             raise RuntimeError(f"Vips processing failed: {str(e)}")
 
@@ -55,10 +61,10 @@ class VipsProcessor(BaseProcessor):
         Resize image while maintaining aspect ratio using libvips' thumbnail-style scaling.
         """
         try:
-            import pyvips
+            import pyvips  # noqa: F401
         except ImportError:
             raise RuntimeError("pyvips is not installed.")
-            
+
         original_width = img.width
         original_height = img.height
 
@@ -81,14 +87,14 @@ class VipsProcessor(BaseProcessor):
     def _get_save_params(self, options: ProcessingOptions) -> dict:
         """
         Generate libvips-specific save parameters.
-        
+
         :param options: Processing options.
         :return: Dictionary of parameters for write_to_buffer().
         """
         params = {"Q": options.quality}
-        
+
         if options.format == ImageFormat.WEBP:
             params["lossless"] = False
             params["effort"] = 6  # Equivalent to Pillow's method 6
-            
+
         return params

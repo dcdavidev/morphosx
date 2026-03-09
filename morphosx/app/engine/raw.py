@@ -1,8 +1,8 @@
 import io
+from typing import Optional, Tuple
+
 from PIL import Image
 
-
-from typing import Tuple, Optional
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
 
@@ -15,7 +15,12 @@ class RawProcessor(BaseProcessor):
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Extract preview and process it as an image.
         """
@@ -25,15 +30,17 @@ class RawProcessor(BaseProcessor):
     def extract_preview(self, raw_data: bytes) -> bytes:
         """
         Extract the best available preview or render the RAW image to a standard RGB format.
-        
+
         :param raw_data: Raw bytes of the image file.
         :return: Standard image bytes (e.g., JPEG or PNG) ready for ImageProcessor.
         """
         try:
+            import imageio.v3 as iio  # noqa: F401
             import rawpy
-            import imageio.v3 as iio
         except ImportError:
-            raise RuntimeError("rawpy or imageio is not installed. Run 'pip install morphosx[raw]' to enable this feature.")
+            raise RuntimeError(
+                "rawpy or imageio is not installed. Run 'pip install morphosx[raw]' to enable this feature."
+            )
 
         try:
             # Load raw data from memory buffer
@@ -42,18 +49,18 @@ class RawProcessor(BaseProcessor):
                 # use_camera_wb=True ensures colors match the camera settings
                 # half_size=True speeds up processing by reducing resolution,
                 # which is usually fine since the ImageProcessor will likely downscale anyway.
-                # However, for highest quality we might want half_size=False. 
+                # However, for highest quality we might want half_size=False.
                 # Let's use half_size=False for best quality, but it might be slower.
                 rgb = raw.postprocess(use_camera_wb=True, half_size=False)
-                
+
                 # Convert the numpy array to a Pillow Image
                 img = Image.fromarray(rgb)
-                
+
                 # Save to a memory buffer as JPEG
                 output_buffer = io.BytesIO()
                 img.save(output_buffer, format="JPEG", quality=95)
-                
+
                 return output_buffer.getvalue()
-                
+
         except Exception as e:
             raise RuntimeError(f"RAW image processing failed: {str(e)}")

@@ -1,7 +1,8 @@
-import ffmpeg
 import os
 import tempfile
 from typing import Optional, Tuple
+
+import ffmpeg
 
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
@@ -15,17 +16,30 @@ class AudioProcessor(BaseProcessor):
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Generate a waveform and process it as an image.
         """
-        waveform_bytes = self.generate_waveform(source_data, options.width or 800, options.height or 200)
+        waveform_bytes = self.generate_waveform(
+            source_data, options.width or 800, options.height or 200
+        )
         return self.image_processor.process(waveform_bytes, options)
 
-    def generate_waveform(self, audio_data: bytes, width: int = 800, height: int = 200, color: str = 'cyan') -> bytes:
+    def generate_waveform(
+        self,
+        audio_data: bytes,
+        width: int = 800,
+        height: int = 200,
+        color: str = "cyan",
+    ) -> bytes:
         """
         Generate a waveform image (PNG) from an audio file.
-        
+
         :param audio_data: Raw audio bytes.
         :param width: Target width of the waveform image.
         :param height: Target height of the waveform image.
@@ -40,15 +54,16 @@ class AudioProcessor(BaseProcessor):
             # Command: ffmpeg -i input -filter_complex "showwavespic=s=800x200:colors=cyan" -frames:v 1 output.png
             # This generates a visual representation of the audio amplitudes.
             out, _ = (
-                ffmpeg
-                .input(tmp_path)
-                .filter('showwavespic', s=f"{width}x{height}", colors=color)
-                .output('pipe:', vframes=1, format='image2', vcodec='png')
+                ffmpeg.input(tmp_path)
+                .filter("showwavespic", s=f"{width}x{height}", colors=color)
+                .output("pipe:", vframes=1, format="image2", vcodec="png")
                 .run(capture_stdout=True, quiet=True)
             )
             return out
         except ffmpeg.Error as e:
-            raise RuntimeError(f"FFmpeg waveform generation failed: {e.stderr.decode()}")
+            raise RuntimeError(
+                f"FFmpeg waveform generation failed: {e.stderr.decode()}"
+            )
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)

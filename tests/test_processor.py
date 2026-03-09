@@ -1,7 +1,9 @@
 import io
 import time
+
 from PIL import Image
-from morphosx.app.engine.processor import ImageProcessor, ProcessingOptions, ImageFormat
+
+from morphosx.app.engine.processor import ImageFormat, ImageProcessor, ProcessingOptions
 
 
 def create_sample_image(width: int = 1920, height: int = 1080) -> bytes:
@@ -19,17 +21,17 @@ def test_image_processor_resize_and_convert():
     """
     processor = ImageProcessor()
     source_data = create_sample_image()
-    
+
     options = ProcessingOptions(width=300, format=ImageFormat.WEBP, quality=80)
-    
+
     start_time = time.perf_counter()
     processed_bytes, mime_type = processor.process(source_data, options)
     execution_time = time.perf_counter() - start_time
-    
+
     # Assertions
     assert mime_type == "image/webp"
     assert len(processed_bytes) > 0
-    
+
     # Validate result image dimensions
     with Image.open(io.BytesIO(processed_bytes)) as result_img:
         assert result_img.width == 300
@@ -47,10 +49,10 @@ def test_image_processor_no_dimensions():
     """
     processor = ImageProcessor()
     source_data = create_sample_image(500, 500)
-    
+
     options = ProcessingOptions(format=ImageFormat.PNG)
     processed_bytes, mime_type = processor.process(source_data, options)
-    
+
     assert mime_type == "image/png"
     with Image.open(io.BytesIO(processed_bytes)) as result_img:
         assert result_img.size == (500, 500)
@@ -63,11 +65,11 @@ def test_image_processor_aspect_ratio_height():
     Ensure width is calculated correctly when only height is provided.
     """
     processor = ImageProcessor()
-    source_data = create_sample_image(1000, 500) # 2:1 ratio
-    
+    source_data = create_sample_image(1000, 500)  # 2:1 ratio
+
     options = ProcessingOptions(height=250)
     processed_bytes, _ = processor.process(source_data, options)
-    
+
     with Image.open(io.BytesIO(processed_bytes)) as result_img:
         assert result_img.width == 500
         assert result_img.height == 250

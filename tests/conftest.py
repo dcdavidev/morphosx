@@ -1,13 +1,16 @@
-import pytest
 import io
-import os
+
+import pytest
 from PIL import Image
-from morphosx.app.engine.processor import ImageProcessor, ImageFormat, ProcessingOptions
+
+from morphosx.app.engine.processor import ImageFormat, ImageProcessor, ProcessingOptions
+
 
 @pytest.fixture
 def core_processor():
     """Returns the default ImageProcessor used by other engines."""
     return ImageProcessor()
+
 
 @pytest.fixture
 def sample_image():
@@ -17,45 +20,54 @@ def sample_image():
     img.save(buf, format="JPEG")
     return buf.getvalue()
 
+
 @pytest.fixture
 def sample_text():
     """Sample text data."""
     return b"Hello MorphosX\nThis is a test document."
+
 
 @pytest.fixture
 def sample_json():
     """Sample JSON data."""
     return b'{"project": "morphosx", "status": "active"}'
 
+
 @pytest.fixture
 def sample_md():
     """Sample Markdown data."""
     return b"# MorphosX\n\n- High performance\n- Media processing"
+
 
 @pytest.fixture
 def options():
     """Default processing options."""
     return ProcessingOptions(width=200, height=200, format=ImageFormat.WEBP)
 
+
 @pytest.fixture
 def real_image():
     with open("tests/assets/sample.jpg", "rb") as f:
         return f.read()
+
 
 @pytest.fixture
 def real_json():
     with open("tests/assets/sample.json", "rb") as f:
         return f.read()
 
+
 @pytest.fixture
 def real_md():
     with open("tests/assets/sample.md", "rb") as f:
         return f.read()
 
+
 @pytest.fixture
 def real_docx():
     with open("tests/assets/sample.docx", "rb") as f:
         return f.read()
+
 
 @pytest.fixture
 def real_ifc():

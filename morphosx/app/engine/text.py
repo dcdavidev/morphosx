@@ -1,45 +1,57 @@
-import io
 import json
 import xml.dom.minidom
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import markdown
 from pygments import highlight
-from pygments.lexers import get_lexer_by_name, get_lexer_for_filename, ClassNotFound
 from pygments.formatters import ImageFormatter
-from PIL import Image
-
-from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
-
+from pygments.lexers import ClassNotFound, get_lexer_by_name, get_lexer_for_filename
 
 from morphosx.app.engine.base import BaseProcessor
+from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+
 
 class TextProcessor(BaseProcessor):
     """
     Core engine for processing and rendering text-based files (Markdown, JSON, XML).
-    
+
     Can minify/prettify data or render it as a syntax-highlighted image.
     """
 
     def __init__(self, image_processor: BaseProcessor):
         self.image_processor = image_processor
 
-    def process(self, source_data: bytes, options: ProcessingOptions, filename: Optional[str] = None) -> Tuple[bytes, str]:
+    def process(
+        self,
+        source_data: bytes,
+        options: ProcessingOptions,
+        filename: Optional[str] = None,
+    ) -> Tuple[bytes, str]:
         """
         Render to image or return as minified text depending on requested format.
         """
         # If an image format is requested, render it
-        if options.format not in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML, ImageFormat.MD, ImageFormat.HTML):
-            rendered_bytes = self.render_to_image(source_data, filename or "file.txt", options)
+        if options.format not in (
+            ImageFormat.JSON,
+            ImageFormat.YAML,
+            ImageFormat.XML,
+            ImageFormat.MD,
+            ImageFormat.HTML,
+        ):
+            rendered_bytes = self.render_to_image(
+                source_data, filename or "file.txt", options
+            )
             return self.image_processor.process(rendered_bytes, options)
 
         # Otherwise, process as text
         return self.process_text(source_data, filename or "file.txt")
 
-    def render_to_image(self, text_data: bytes, filename: str, options: ProcessingOptions) -> bytes:
+    def render_to_image(
+        self, text_data: bytes, filename: str, options: ProcessingOptions
+    ) -> bytes:
         """
         Render text content as a syntax-highlighted image.
-        
+
         :param text_data: Raw bytes of the text file.
         :param filename: Original filename to determine the lexer.
         :param options: Transformation parameters.
@@ -47,7 +59,7 @@ class TextProcessor(BaseProcessor):
         """
         try:
             content = text_data.decode("utf-8")
-            
+
             # Determine lexer
             try:
                 if filename.endswith(".json"):
@@ -68,53 +80,54 @@ class TextProcessor(BaseProcessor):
 
             # Configure high-quality formatter
             formatter = ImageFormatter(
-                font_name="DejaVu Sans Mono", # Generic mono font
+                font_name="DejaVu Sans Mono",  # Generic mono font
                 font_size=16,
                 line_number_chars=3,
                 line_numbers=True,
-                style="monokai"
+                style="monokai",
             )
 
             # Highlight to image
             image_bytes = highlight(content, lexer, formatter)
-            
+
             # If width/height options are provided, we'll let the main ImageProcessor handle final scaling
             # But we return these bytes as the "source image" for the pipeline
             return image_bytes
-            
+
         except Exception as e:
             raise RuntimeError(f"Text rendering failed: {str(e)}")
 
     def process_text(self, text_data: bytes, filename: str) -> Tuple[bytes, str]:
         """
         Apply text-specific processing like minification.
-        
+
         :param text_data: Raw bytes.
         :param filename: Filename for extension.
         :return: (Processed bytes, mime-type).
         """
         ext = filename.split(".")[-1].lower()
         content = text_data.decode("utf-8")
-        
+
         try:
             if ext == "json":
                 # Minify JSON for delivery
                 data = json.loads(content)
-                minified = json.dumps(data, separators=(',', ':'))
+                minified = json.dumps(data, separators=(",", ":"))
                 return minified.encode("utf-8"), "application/json"
-            
+
             elif ext == "xml":
                 # Basic XML whitespace cleanup
                 import re
-                minified = re.sub(r'>\s+<', '><', content).strip()
+
+                minified = re.sub(r">\s+<", "><", content).strip()
                 return minified.encode("utf-8"), "application/xml"
-                
+
             elif ext == "md":
                 # We could convert MD to HTML here if needed
                 html = markdown.markdown(content)
                 return html.encode("utf-8"), "text/html"
-            
+
             return text_data, "text/plain"
-            
+
         except Exception:
             return text_data, f"text/{ext}"

@@ -1,18 +1,20 @@
 from fastapi import FastAPI
+
 from morphosx.app import __version__
 from morphosx.app.api.assets import router as assets_router
 from morphosx.app.settings import settings
 
+
 def create_app() -> FastAPI:
     """
     Initialize and configure the FastAPI application.
-    
+
     :return: FastAPI instance.
     """
     app = FastAPI(
         title=settings.app_name,
         description="High-performance OSS cloud storage for on-the-fly image processing.",
-        version=__version__
+        version=__version__,
     )
 
     # Register API routes
@@ -29,6 +31,7 @@ def create_app() -> FastAPI:
         return {"status": "ok", "app": settings.app_name}
 
     return app
+
 
 # Main entry point for uvicorn
 app = create_app()
