@@ -1,3 +1,9 @@
+## v0.8.14 (2026-03-09)
+
+### Fix
+
+- **ci**: ensure version bump after stack migration
+
 ## v0.8.13 (2026-03-09)
 
 ### Fix
