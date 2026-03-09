@@ -1,7 +1,7 @@
 import ffmpeg
 import os
 import tempfile
-
+from typing import Optional, Tuple
 
 from morphosx.app.engine.base import BaseProcessor
 from morphosx.app.engine.processor import ProcessingOptions
