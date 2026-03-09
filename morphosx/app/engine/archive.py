@@ -5,8 +5,8 @@ from typing import Optional, Tuple
 
 from PIL import Image, ImageDraw
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class ArchiveProcessor(BaseProcessor):
@@ -53,16 +53,12 @@ class ArchiveProcessor(BaseProcessor):
             return self._create_folder_card(title, summary)
 
         except Exception as e:
-            return self._create_folder_card(
-                "Archive Error", f"Could not read archive: {str(e)}"
-            )
+            return self._create_folder_card("Archive Error", f"Could not read archive: {str(e)}")
 
     def _create_folder_card(self, title: str, text: str) -> bytes:
         """Render a folder-style card image."""
         width, height = 800, 600
-        img = Image.new(
-            "RGB", (width, height), color=(255, 250, 230)
-        )  # Manila folder yellow
+        img = Image.new("RGB", (width, height), color=(255, 250, 230))  # Manila folder yellow
         draw = ImageDraw.Draw(img)
 
         # Draw a folder 'tab'

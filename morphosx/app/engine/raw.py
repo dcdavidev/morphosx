@@ -3,8 +3,8 @@ from typing import Optional, Tuple
 
 from PIL import Image
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class RawProcessor(BaseProcessor):

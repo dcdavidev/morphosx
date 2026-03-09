@@ -26,20 +26,16 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
+          enable-cache: true
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 2.3.2
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+      - name: Set up Python
+        run: uv python install 3.12
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: uv sync --all-extras
 
       - name: Configure Git
         run: |
@@ -47,7 +43,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run Release
-        run: poetry run poe release
+        run: uv run poe release
 
       - name: Push changes
         run: |

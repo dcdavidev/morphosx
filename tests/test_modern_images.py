@@ -3,7 +3,8 @@ import io
 import pillow_heif
 from PIL import Image
 
-from morphosx.app.engine.processor import ImageFormat, ImageProcessor, ProcessingOptions
+from morphosx.app.engine.processor import ImageProcessor
+from morphosx.app.engine.types import ImageFormat, ProcessingOptions
 
 
 def test_image_processor_heif_support():

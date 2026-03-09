@@ -2,8 +2,8 @@ import os
 import tempfile
 from typing import Optional, Tuple
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class VideoProcessor(BaseProcessor):
@@ -59,9 +59,7 @@ class VideoProcessor(BaseProcessor):
             )
             return out
         except ffmpeg.Error as e:
-            raise RuntimeError(
-                f"FFmpeg thumbnail extraction failed: {e.stderr.decode()}"
-            )
+            raise RuntimeError(f"FFmpeg thumbnail extraction failed: {e.stderr.decode()}")
         finally:
             # Cleanup temp file
             if os.path.exists(tmp_path):
@@ -85,11 +83,7 @@ class VideoProcessor(BaseProcessor):
         try:
             probe = ffmpeg.probe(tmp_path)
             video_stream = next(
-                (
-                    stream
-                    for stream in probe["streams"]
-                    if stream["codec_type"] == "video"
-                ),
+                (stream for stream in probe["streams"] if stream["codec_type"] == "video"),
                 None,
             )
 

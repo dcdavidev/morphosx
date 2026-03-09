@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from .base import BaseProcessor
+from .types import ImageFormat, ProcessingOptions
 
 
 class VipsProcessor(BaseProcessor):
@@ -24,9 +24,7 @@ class VipsProcessor(BaseProcessor):
         try:
             import pyvips  # noqa: F401
         except ImportError:
-            raise RuntimeError(
-                "pyvips is not installed. Run 'pip install morphosx[vips]' to enable this feature."
-            )
+            raise RuntimeError("pyvips is not installed. Run 'pip install morphosx[vips]' to enable this feature.")
 
         try:
             # Load image from memory buffer

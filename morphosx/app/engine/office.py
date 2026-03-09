@@ -3,8 +3,8 @@ from typing import Optional, Tuple
 
 from PIL import Image, ImageDraw
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class OfficeProcessor(BaseProcessor):
@@ -53,17 +53,13 @@ class OfficeProcessor(BaseProcessor):
                 doc = Document(io.BytesIO(doc_data))
                 title = "Word Document"
                 # Extract first 5 paragraphs
-                summary = "\n".join(
-                    [p.text for p in doc.paragraphs[:5] if p.text.strip()]
-                )
+                summary = "\n".join([p.text for p in doc.paragraphs[:5] if p.text.strip()])
             elif ext == "pptx":
                 prs = Presentation(io.BytesIO(doc_data))
                 title = f"PowerPoint ({len(prs.slides)} slides)"
                 if len(prs.slides) > 0:
                     slide = prs.slides[0]
-                    summary = "\n".join(
-                        [shape.text for shape in slide.shapes if hasattr(shape, "text")]
-                    )
+                    summary = "\n".join([shape.text for shape in slide.shapes if hasattr(shape, "text")])
             elif ext == "xlsx":
                 wb = load_workbook(io.BytesIO(doc_data), data_only=True)
                 ws = wb.active
@@ -77,9 +73,7 @@ class OfficeProcessor(BaseProcessor):
             return self._create_summary_card(title, summary[:500])
 
         except Exception as e:
-            return self._create_summary_card(
-                "Error", f"Could not parse office file: {str(e)}"
-            )
+            return self._create_summary_card("Error", f"Could not parse office file: {str(e)}")
 
     def _create_summary_card(self, title: str, text: str) -> bytes:
         """Render a text-based summary card image."""

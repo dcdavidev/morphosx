@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, Up
 from morphosx.app.core.auth import get_current_user
 from morphosx.app.core.security import generate_signature, verify_signature
 from morphosx.app.engine.base import initialize_registry
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from morphosx.app.engine.types import ImageFormat, ProcessingOptions
 from morphosx.app.settings import settings
 from morphosx.app.storage.local import LocalStorage
 from morphosx.app.storage.s3 import S3Storage
@@ -63,9 +63,7 @@ async def upload_asset(
     # Determine base prefix
     if private:
         if not current_user:
-            raise HTTPException(
-                status_code=401, detail="Authentication required for private uploads"
-            )
+            raise HTTPException(status_code=401, detail="Authentication required for private uploads")
         base_prefix = f"users/{current_user}"
     else:
         base_prefix = "originals"
@@ -153,9 +151,7 @@ def _verify_asset_access(asset_id: str, current_user: Optional[str]):
 
         owner_id = parts[1]
         if current_user != owner_id:
-            raise HTTPException(
-                status_code=403, detail="Not authorized to access this private asset"
-            )
+            raise HTTPException(status_code=403, detail="Not authorized to access this private asset")
 
 
 def _verify_request_signature(
@@ -187,12 +183,8 @@ def _verify_request_signature(
 @router.get("/{asset_id:path}")
 async def get_processed_asset(
     asset_id: str,
-    w: Optional[int] = Query(
-        None, alias="width", ge=1, le=settings.max_image_dimension
-    ),
-    h: Optional[int] = Query(
-        None, alias="height", ge=1, le=settings.max_image_dimension
-    ),
+    w: Optional[int] = Query(None, alias="width", ge=1, le=settings.max_image_dimension),
+    h: Optional[int] = Query(None, alias="height", ge=1, le=settings.max_image_dimension),
     fmt: Optional[ImageFormat] = Query(None, alias="format"),
     q: Optional[int] = Query(None, alias="quality", ge=1, le=100),
     preset: Optional[str] = Query(None, alias="preset"),
@@ -248,9 +240,7 @@ async def get_processed_asset(
         if not processor:
             raise HTTPException(status_code=415, detail="Unsupported media type")
 
-        processed_data, mime_type = processor.process(
-            source_bytes, options, filename=asset_id
-        )
+        processed_data, mime_type = processor.process(source_bytes, options, filename=asset_id)
 
         # 7. Store derivative for future requests
         await storage.save_asset(derivative_id, processed_data)
@@ -271,9 +261,7 @@ async def get_processed_asset(
 
 
 @router.get("/list/{path:path}")
-async def list_assets(
-    path: str = "", current_user: Optional[str] = Depends(get_current_user)
-):
+async def list_assets(path: str = "", current_user: Optional[str] = Depends(get_current_user)):
     """
     List files and folders in a given path.
     """
@@ -283,9 +271,7 @@ async def list_assets(
         if len(parts) >= 2:
             owner_id = parts[1]
             if current_user != owner_id:
-                raise HTTPException(
-                    status_code=403, detail="Not authorized to browse this folder"
-                )
+                raise HTTPException(status_code=403, detail="Not authorized to browse this folder")
 
     # If path is empty, default to listing 'originals/' (public root)
     if not path:

@@ -6,8 +6,8 @@ from typing import Optional, Tuple
 import yaml
 from PIL import Image, ImageDraw
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from .base import BaseProcessor
+from .types import ImageFormat, ProcessingOptions
 
 
 class BIMProcessor(BaseProcessor):
@@ -63,9 +63,7 @@ class BIMProcessor(BaseProcessor):
         try:
             import ifcopenshell
         except ImportError:
-            raise RuntimeError(
-                "ifcopenshell is not installed. Run 'pip install morphosx[bim]' to enable this feature."
-            )
+            raise RuntimeError("ifcopenshell is not installed. Run 'pip install morphosx[bim]' to enable this feature.")
 
         try:
             import os
@@ -79,11 +77,7 @@ class BIMProcessor(BaseProcessor):
                 model = ifcopenshell.open(tmp_path)
 
                 # Metadata extraction
-                project = (
-                    model.by_type("IfcProject")[0]
-                    if model.by_type("IfcProject")
-                    else None
-                )
+                project = model.by_type("IfcProject")[0] if model.by_type("IfcProject") else None
                 site = model.by_type("IfcSite")[0] if model.by_type("IfcSite") else None
 
                 walls = len(model.by_type("IfcWall"))
@@ -146,9 +140,7 @@ class BIMProcessor(BaseProcessor):
         draw.text((120, 130), text, fill=(180, 200, 180))
 
         # Simple house icon silhouette
-        draw.polygon(
-            [(600, 200), (750, 200), (675, 100)], outline=(100, 255, 100), width=2
-        )
+        draw.polygon([(600, 200), (750, 200), (675, 100)], outline=(100, 255, 100), width=2)
         draw.rectangle([620, 200, 730, 300], outline=(100, 255, 100), width=2)
 
         output = io.BytesIO()

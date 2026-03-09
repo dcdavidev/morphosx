@@ -7,8 +7,8 @@ import trimesh
 import yaml
 from PIL import Image, ImageDraw
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from .base import BaseProcessor
+from .types import ImageFormat, ProcessingOptions
 
 
 class Model3DProcessor(BaseProcessor):

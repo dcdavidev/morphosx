@@ -3,7 +3,8 @@ import time
 
 from PIL import Image
 
-from morphosx.app.engine.processor import ImageFormat, ImageProcessor, ProcessingOptions
+from morphosx.app.engine.processor import ImageProcessor
+from morphosx.app.engine.types import ImageFormat, ProcessingOptions
 
 
 def create_sample_image(width: int = 1920, height: int = 1080) -> bytes:

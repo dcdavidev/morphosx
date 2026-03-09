@@ -7,8 +7,8 @@ from pygments import highlight
 from pygments.formatters import ImageFormatter
 from pygments.lexers import ClassNotFound, get_lexer_by_name, get_lexer_for_filename
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from .base import BaseProcessor
+from .types import ImageFormat, ProcessingOptions
 
 
 class TextProcessor(BaseProcessor):
@@ -38,17 +38,13 @@ class TextProcessor(BaseProcessor):
             ImageFormat.MD,
             ImageFormat.HTML,
         ):
-            rendered_bytes = self.render_to_image(
-                source_data, filename or "file.txt", options
-            )
+            rendered_bytes = self.render_to_image(source_data, filename or "file.txt", options)
             return self.image_processor.process(rendered_bytes, options)
 
         # Otherwise, process as text
         return self.process_text(source_data, filename or "file.txt")
 
-    def render_to_image(
-        self, text_data: bytes, filename: str, options: ProcessingOptions
-    ) -> bytes:
+    def render_to_image(self, text_data: bytes, filename: str, options: ProcessingOptions) -> bytes:
         """
         Render text content as a syntax-highlighted image.
 

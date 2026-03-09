@@ -3,7 +3,7 @@ import io
 import pytest
 from PIL import Image
 
-from morphosx.app.engine.processor import ImageFormat, ProcessingOptions
+from morphosx.app.engine.types import ImageFormat, ProcessingOptions
 from morphosx.app.engine.vips import VipsProcessor
 
 

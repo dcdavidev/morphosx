@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class DocumentProcessor(BaseProcessor):
@@ -24,9 +24,7 @@ class DocumentProcessor(BaseProcessor):
         page_bytes = self.extract_page_as_image(source_data, options.page, dpi=150)
         return self.image_processor.process(page_bytes, options)
 
-    def extract_page_as_image(
-        self, document_data: bytes, page_number: int = 1, dpi: int = 150
-    ) -> bytes:
+    def extract_page_as_image(self, document_data: bytes, page_number: int = 1, dpi: int = 150) -> bytes:
         """
         Extract a specific page from a PDF and render it as a PNG image.
 
@@ -36,11 +34,9 @@ class DocumentProcessor(BaseProcessor):
         :return: PNG image bytes.
         """
         try:
-            import fitz  # PyMuPDF
+            import fitz  # PyMuPDF # noqa: F401
         except ImportError:
-            raise RuntimeError(
-                "pymupdf is not installed. Run 'pip install morphosx[pdf]' to enable this feature."
-            )
+            raise RuntimeError("pymupdf is not installed. Run 'pip install morphosx[pdf]' to enable this feature.")
 
         try:
             # Open PDF from memory stream
@@ -50,9 +46,7 @@ class DocumentProcessor(BaseProcessor):
             page_index = max(0, page_number - 1)
 
             if page_index >= len(doc):
-                raise ValueError(
-                    f"Page {page_number} is out of bounds for a {len(doc)}-page document."
-                )
+                raise ValueError(f"Page {page_number} is out of bounds for a {len(doc)}-page document.")
 
             page = doc[page_index]
 

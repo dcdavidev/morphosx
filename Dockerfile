@@ -1,15 +1,14 @@
 # --- STAGE 1: Builder ---
 FROM python:3.12-slim AS builder
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    DEBIAN_FRONTEND=noninteractive \
-    POETRY_VERSION=2.3.2 \
-    POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_NO_INTERACTION=1
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-ENV PATH="$POETRY_HOME/bin:$PATH"
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /app
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,16 +17,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvips-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Install dependencies first (layer caching)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    uv sync --frozen --no-install-project --all-extras
 
-WORKDIR /app
-
-# Copy dependency files
-COPY pyproject.toml poetry.lock README.md ./
-
-# Install dependencies
-RUN poetry install --all-extras --no-root --no-interaction --no-ansi
+# Copy source and install project
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --all-extras
 
 
 # --- STAGE 2: Runtime ---
@@ -36,9 +35,6 @@ FROM python:3.12-slim AS runtime
 WORKDIR /app
 
 # Install runtime system dependencies
-# ffmpeg: for video/audio processing
-# libvips: for high-performance image engine
-# curl, ca-certificates: to install infisical cli
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libvips42 \
@@ -49,18 +45,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get update && apt-get install -y infisical \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy installed python packages from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Copy virtualenv from builder
+COPY --from=builder /app/.venv /app/.venv
 
-# Copy application code
-COPY . .
-
-# Create storage directories
-RUN mkdir -p storage/originals storage/cache storage/users
-
-# Expose FastAPI custom portgit
-EXPOSE 6100
+# Add virtualenv to PATH
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Set environment defaults
 ENV MORPHOSX_PORT=6100 \
@@ -68,5 +57,11 @@ ENV MORPHOSX_PORT=6100 \
     MORPHOSX_ENGINE_TYPE="vips" \
     MORPHOSX_STORAGE_PATH="/app/storage"
 
-# Run the application using the custom port
-CMD ["sh", "-c", "uvicorn morphosx.app.main:app --host 0.0.0.0 --port ${MORPHOSX_PORT}"]
+# Create storage directories
+RUN mkdir -p storage/originals storage/cache storage/users
+
+# Expose FastAPI custom port
+EXPOSE 6100
+
+# Run the application
+CMD ["uvicorn", "morphosx.app.main:app", "--host", "0.0.0.0", "--port", "6100"]

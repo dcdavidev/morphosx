@@ -4,8 +4,8 @@ from typing import Optional, Tuple
 
 import ffmpeg
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class AudioProcessor(BaseProcessor):
@@ -25,9 +25,7 @@ class AudioProcessor(BaseProcessor):
         """
         Generate a waveform and process it as an image.
         """
-        waveform_bytes = self.generate_waveform(
-            source_data, options.width or 800, options.height or 200
-        )
+        waveform_bytes = self.generate_waveform(source_data, options.width or 800, options.height or 200)
         return self.image_processor.process(waveform_bytes, options)
 
     def generate_waveform(
@@ -61,9 +59,7 @@ class AudioProcessor(BaseProcessor):
             )
             return out
         except ffmpeg.Error as e:
-            raise RuntimeError(
-                f"FFmpeg waveform generation failed: {e.stderr.decode()}"
-            )
+            raise RuntimeError(f"FFmpeg waveform generation failed: {e.stderr.decode()}")
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)

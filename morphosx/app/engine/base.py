@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
-from morphosx.app.engine.processor import ProcessingOptions
+from .types import ProcessingOptions
 
 
 class BaseProcessor(ABC):

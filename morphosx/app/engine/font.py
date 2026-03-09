@@ -3,8 +3,8 @@ from typing import Optional, Tuple
 
 from PIL import Image, ImageDraw, ImageFont
 
-from morphosx.app.engine.base import BaseProcessor
-from morphosx.app.engine.processor import ProcessingOptions
+from .base import BaseProcessor
+from .types import ProcessingOptions
 
 
 class FontProcessor(BaseProcessor):
@@ -59,9 +59,7 @@ class FontProcessor(BaseProcessor):
 
             # Draw a larger sample
             large_font = ImageFont.truetype(io.BytesIO(font_data), 72)
-            draw.text(
-                (40, y), "MorphosX Media Engine", font=large_font, fill=(43, 108, 176)
-            )
+            draw.text((40, y), "MorphosX Media Engine", font=large_font, fill=(43, 108, 176))
 
             output = io.BytesIO()
             img.save(output, format="JPEG")
