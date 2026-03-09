@@ -1,5 +1,5 @@
 import io
-from typing import Tuple
+from typing import Tuple, Optional
 from PIL import Image, ImageDraw, ImageFont
 
 
