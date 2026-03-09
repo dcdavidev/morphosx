@@ -24,6 +24,8 @@ class ImageFormat(str, Enum):
     JSON = "JSON"
     YAML = "YAML"
     XML = "XML"
+    MD = "MD"
+    HTML = "HTML"
 
 
 @dataclass(frozen=True)

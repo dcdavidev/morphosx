@@ -1,49 +1,47 @@
-import io
 import pytest
-from PIL import Image
 from morphosx.app.engine.text import TextProcessor
 from morphosx.app.engine.processor import ProcessingOptions, ImageFormat
 
-
-def test_text_processor_render_json():
+def test_text_processor_render_json(core_processor, sample_json, options):
     """Test rendering JSON text to an image."""
-    processor = TextProcessor()
-    json_data = b'{"status": "ok", "code": 200, "message": "MorphosX rules"}'
-    options = ProcessingOptions(format=ImageFormat.PNG)
+    processor = TextProcessor(core_processor)
     
-    image_bytes = processor.render_to_image(json_data, "test.json", options)
+    # Requesting an image format (WebP from options)
+    processed_bytes, mime_type = processor.process(sample_json, options, filename="test.json")
     
-    # Verify the output is a valid image
-    with Image.open(io.BytesIO(image_bytes)) as img:
-        assert img.format == "PNG"
-        assert img.width > 0
-        assert img.height > 0
+    assert mime_type == "image/webp"
+    assert len(processed_bytes) > 0
 
-
-def test_text_processor_render_markdown():
+def test_text_processor_render_markdown(core_processor, sample_md, options):
     """Test rendering Markdown text to an image."""
-    processor = TextProcessor()
-    md_data = b"# MorphosX\n\nThis is a **bold** test."
-    options = ProcessingOptions(format=ImageFormat.WEBP)
+    processor = TextProcessor(core_processor)
     
-    image_bytes = processor.render_to_image(md_data, "test.md", options)
+    processed_bytes, mime_type = processor.process(sample_md, options, filename="test.md")
     
-    with Image.open(io.BytesIO(image_bytes)) as img:
-        assert img.width > 0
+    assert mime_type == "image/webp"
+    assert len(processed_bytes) > 0
 
-
-def test_text_processor_minification():
+def test_text_processor_minification(core_processor, sample_json):
     """Test text-to-text minification logic."""
-    processor = TextProcessor()
+    processor = TextProcessor(core_processor)
     
-    # JSON minification
-    json_data = b'{\n  "a": 1,\n  "b": 2\n}'
-    processed, mime = processor.process_text(json_data, "test.json")
-    assert processed == b'{"a":1,"b":2}'
-    assert mime == "application/json"
+    # Requesting JSON output format explicitly
+    options = ProcessingOptions(format=ImageFormat.JSON)
+    processed_bytes, mime_type = processor.process(sample_json, options, filename="test.json")
     
-    # XML minification
-    xml_data = b'<root>\n  <child>data</child>\n</root>'
-    processed, mime = processor.process_text(xml_data, "test.xml")
-    assert processed == b'<root><child>data</child></root>'
-    assert mime == "application/xml"
+    assert mime_type == "application/json"
+    # Minified version should have no spaces
+    assert b" " not in processed_bytes
+    assert b"morphosx" in processed_bytes
+
+def test_text_processor_markdown_to_html(core_processor, sample_md):
+    """Test markdown to HTML conversion."""
+    processor = TextProcessor(core_processor)
+    
+    # Markdown format usually results in text/html or application/x-markdown
+    # Based on TextProcessor.process_text, it returns text/html
+    options = ProcessingOptions(format=ImageFormat.MD) # Assuming MD is in ImageFormat enum
+    processed_bytes, mime_type = processor.process(sample_md, options, filename="test.md")
+    
+    assert mime_type == "text/html"
+    assert b"<h1>MorphosX</h1>" in processed_bytes

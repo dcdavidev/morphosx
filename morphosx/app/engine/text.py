@@ -29,7 +29,7 @@ class TextProcessor(BaseProcessor):
         Render to image or return as minified text depending on requested format.
         """
         # If an image format is requested, render it
-        if options.format not in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML):
+        if options.format not in (ImageFormat.JSON, ImageFormat.YAML, ImageFormat.XML, ImageFormat.MD, ImageFormat.HTML):
             rendered_bytes = self.render_to_image(source_data, filename or "file.txt", options)
             return self.image_processor.process(rendered_bytes, options)
 
