@@ -1,3 +1,10 @@
+## v0.8.11 (2026-03-09)
+
+### Fix
+
+- **all**: resolve NameError in processors and update Infisical setup URL
+- **engine**: ensure all processors have Tuple and Optional imports
+
 ## v0.8.10 (2026-03-09)
 
 ### Fix
